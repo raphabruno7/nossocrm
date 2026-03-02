@@ -91,6 +91,8 @@ export interface DbBoard {
   lost_stage_id: string | null;
   /** Produto padrão para deals desse board (opcional). */
   default_product_id?: string | null;
+  /** Moeda do board/pipeline (BRL/EUR). */
+  currency_code?: string | null;
   /** Se deve manter no estágio ao ganhar (true) ou mover (false/null). */
   won_stay_in_stage: boolean | null;
   /** Se deve manter no estágio ao perder (true) ou mover (false/null). */
@@ -202,6 +204,7 @@ const transformBoard = (db: DbBoard, stages: DbBoardStage[]): Board => {
     wonStayInStage: db.won_stay_in_stage || false,
     lostStayInStage: db.lost_stay_in_stage || false,
     defaultProductId: (db as any).default_product_id || undefined,
+    currencyCode: (db as any).currency_code === 'EUR' ? 'EUR' : 'BRL',
     goal,
     agentPersona,
     entryTrigger: db.entry_trigger || undefined,
@@ -262,6 +265,10 @@ const transformToDb = (board: Omit<Board, 'id' | 'createdAt'>, order?: number): 
     automation_suggestions: board.automationSuggestions || null,
     position: order ?? 0,
   };
+
+  if (board.currencyCode) {
+    (db as any).currency_code = board.currencyCode;
+  }
 
   if (defaultProductId) {
     db.default_product_id = defaultProductId;
@@ -431,6 +438,13 @@ export const boardsService = {
           .select()
           .single();
 
+        // Backwards-compat: DB may not have currency_code yet (migration not applied).
+        if (insert.error && isMissingColumnInSchemaCache(insert.error, 'boards', 'currency_code')) {
+          const retryData = { ...(boardData as any) };
+          delete retryData.currency_code;
+          insert = await supabase.from('boards').insert(retryData).select().single();
+        }
+
         // Backwards-compat: DB may not have default_product_id yet (migration not applied).
         if (insert.error && isMissingColumnInSchemaCache(insert.error, 'boards', 'default_product_id')) {
           const retryData = { ...(boardData as any) };
@@ -554,6 +568,7 @@ export const boardsService = {
       if (updates.wonStayInStage !== undefined) dbUpdates.won_stay_in_stage = updates.wonStayInStage;
       if (updates.lostStayInStage !== undefined) dbUpdates.lost_stay_in_stage = updates.lostStayInStage;
       if (updates.defaultProductId !== undefined) dbUpdates.default_product_id = sanitizeUUID(updates.defaultProductId as any);
+      if (updates.currencyCode !== undefined) (dbUpdates as any).currency_code = updates.currencyCode || 'BRL';
       if (updates.entryTrigger !== undefined) dbUpdates.entry_trigger = updates.entryTrigger || null;
       if (updates.automationSuggestions !== undefined) dbUpdates.automation_suggestions = updates.automationSuggestions || null;
 
@@ -593,6 +608,19 @@ export const boardsService = {
       if (error && isMissingColumnInSchemaCache(error, 'boards', 'default_product_id')) {
         const retryUpdates = { ...(dbUpdates as any) };
         delete retryUpdates.default_product_id;
+
+        const retry = await supabase
+          .from('boards')
+          .update(retryUpdates)
+          .eq('id', id);
+
+        error = retry.error as any;
+      }
+
+      // Backwards-compat: ignore currency_code updates if column isn't present yet.
+      if (error && isMissingColumnInSchemaCache(error, 'boards', 'currency_code')) {
+        const retryUpdates = { ...(dbUpdates as any) };
+        delete retryUpdates.currency_code;
 
         const retry = await supabase
           .from('boards')

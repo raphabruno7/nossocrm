@@ -7,8 +7,17 @@
  */
 
 import { supabase } from './client';
-import { Product } from '@/types';
+import { Product, CurrencyCode } from '@/types';
 import { sanitizeUUID } from './utils';
+
+function isMissingColumnInSchemaCache(error: unknown, table: string, column: string): boolean {
+  const message = String((error as any)?.message ?? '');
+  return (
+    message.includes(`Could not find the '${column}' column`) &&
+    message.includes(`'${table}'`) &&
+    message.includes('schema cache')
+  );
+}
 
 // =============================================================================
 // Organization inference (client-side, RLS-safe)
@@ -44,6 +53,7 @@ type DbProduct = {
   name: string;
   description: string | null;
   price: number;
+  currency_code?: string | null;
   sku: string | null;
   active: boolean | null;
   created_at: string;
@@ -58,6 +68,7 @@ function transformProduct(db: DbProduct): Product {
     name: db.name,
     description: db.description || undefined,
     price: Number(db.price ?? 0),
+    currencyCode: (db as any).currency_code === 'EUR' ? 'EUR' : 'BRL',
     sku: db.sku || undefined,
     active: db.active ?? true,
   };
@@ -70,7 +81,7 @@ export const productsService = {
 
       const { data, error } = await supabase
         .from('products')
-        .select('id, organization_id, name, description, price, sku, active, created_at, updated_at, owner_id')
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) return { data: [], error };
@@ -89,7 +100,7 @@ export const productsService = {
 
       const { data, error } = await supabase
         .from('products')
-        .select('id, organization_id, name, description, price, sku, active, created_at, updated_at, owner_id')
+        .select('*')
         .eq('active', true)
         .order('created_at', { ascending: false });
 
@@ -102,26 +113,37 @@ export const productsService = {
     }
   },
 
-  async create(input: { name: string; price: number; sku?: string; description?: string }): Promise<{ data: Product | null; error: Error | null }> {
+  async create(input: { name: string; price: number; currencyCode?: CurrencyCode; sku?: string; description?: string }): Promise<{ data: Product | null; error: Error | null }> {
     try {
       if (!supabase) return { data: null, error: new Error('Supabase não configurado') };
 
       const { data: { user } } = await supabase.auth.getUser();
       const organizationId = await getCurrentOrganizationId();
 
-      const { data, error } = await supabase
+      const insertPayload: Record<string, unknown> = {
+        name: input.name,
+        price: input.price,
+        currency_code: input.currencyCode || 'BRL',
+        sku: input.sku || null,
+        description: input.description || null,
+        active: true,
+        owner_id: sanitizeUUID(user?.id),
+        organization_id: organizationId,
+      };
+
+      let { data, error } = await supabase
         .from('products')
-        .insert({
-          name: input.name,
-          price: input.price,
-          sku: input.sku || null,
-          description: input.description || null,
-          active: true,
-          owner_id: sanitizeUUID(user?.id),
-          organization_id: organizationId,
-        })
-        .select('id, organization_id, name, description, price, sku, active, created_at, updated_at, owner_id')
+        .insert(insertPayload)
+        .select('*')
         .single();
+
+      if (error && isMissingColumnInSchemaCache(error, 'products', 'currency_code')) {
+        const retryPayload = { ...insertPayload };
+        delete (retryPayload as any).currency_code;
+        const retry = await supabase.from('products').insert(retryPayload).select('*').single();
+        data = retry.data as any;
+        error = retry.error as any;
+      }
 
       if (error) return { data: null, error };
       return { data: transformProduct(data as DbProduct), error: null };
@@ -130,22 +152,33 @@ export const productsService = {
     }
   },
 
-  async update(id: string, updates: Partial<{ name: string; price: number; sku?: string; description?: string; active: boolean }>): Promise<{ error: Error | null }> {
+  async update(id: string, updates: Partial<{ name: string; price: number; currencyCode: CurrencyCode; sku?: string; description?: string; active: boolean }>): Promise<{ error: Error | null }> {
     try {
       if (!supabase) return { error: new Error('Supabase não configurado') };
 
       const payload: Record<string, unknown> = {};
       if (updates.name !== undefined) payload.name = updates.name;
       if (updates.price !== undefined) payload.price = updates.price;
+      if (updates.currencyCode !== undefined) payload.currency_code = updates.currencyCode;
       if (updates.sku !== undefined) payload.sku = updates.sku || null;
       if (updates.description !== undefined) payload.description = updates.description || null;
       if (updates.active !== undefined) payload.active = updates.active;
       payload.updated_at = new Date().toISOString();
 
-      const { error } = await supabase
+      let { error } = await supabase
         .from('products')
         .update(payload)
         .eq('id', sanitizeUUID(id));
+
+      if (error && isMissingColumnInSchemaCache(error, 'products', 'currency_code')) {
+        const retryPayload = { ...(payload as any) };
+        delete retryPayload.currency_code;
+        const retry = await supabase
+          .from('products')
+          .update(retryPayload)
+          .eq('id', sanitizeUUID(id));
+        error = retry.error as any;
+      }
 
       return { error: error ?? null };
     } catch (e) {
@@ -167,4 +200,3 @@ export const productsService = {
     }
   },
 };
-

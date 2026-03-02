@@ -1,15 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Package, Pencil, Plus, Save, Trash2, ToggleLeft, ToggleRight, X } from 'lucide-react';
 import { productsService } from '@/lib/supabase';
-import type { Product } from '@/types';
-
-function formatBRL(v: number) {
-  try {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
-  } catch {
-    return `R$ ${v.toFixed(2)}`;
-  }
-}
+import { formatCurrency } from '@/lib/currency';
+import type { CurrencyCode, Product } from '@/types';
 
 /**
  * Componente React `ProductsCatalogManager`.
@@ -22,6 +15,7 @@ export const ProductsCatalogManager: React.FC = () => {
 
   const [name, setName] = useState('');
   const [price, setPrice] = useState<string>('0');
+  const [currencyCode, setCurrencyCode] = useState<CurrencyCode>('BRL');
   const [sku, setSku] = useState('');
   const [description, setDescription] = useState('');
 
@@ -30,6 +24,7 @@ export const ProductsCatalogManager: React.FC = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [editPrice, setEditPrice] = useState<string>('0');
+  const [editCurrencyCode, setEditCurrencyCode] = useState<CurrencyCode>('BRL');
   const [editSku, setEditSku] = useState('');
   const [editDescription, setEditDescription] = useState('');
 
@@ -71,6 +66,7 @@ export const ProductsCatalogManager: React.FC = () => {
     const res = await productsService.create({
       name: name.trim(),
       price: Number(price),
+      currencyCode,
       sku: sku.trim() || undefined,
       description: description.trim() || undefined,
     });
@@ -81,6 +77,7 @@ export const ProductsCatalogManager: React.FC = () => {
     }
     setName('');
     setPrice('0');
+    setCurrencyCode('BRL');
     setSku('');
     setDescription('');
     await load();
@@ -105,6 +102,7 @@ export const ProductsCatalogManager: React.FC = () => {
     setEditingId(p.id);
     setEditName(p.name || '');
     setEditPrice(String(p.price ?? 0));
+    setEditCurrencyCode(p.currencyCode || 'BRL');
     setEditSku(p.sku || '');
     setEditDescription(p.description || '');
   };
@@ -113,6 +111,7 @@ export const ProductsCatalogManager: React.FC = () => {
     setEditingId(null);
     setEditName('');
     setEditPrice('0');
+    setEditCurrencyCode('BRL');
     setEditSku('');
     setEditDescription('');
   };
@@ -136,6 +135,7 @@ export const ProductsCatalogManager: React.FC = () => {
     const res = await productsService.update(editingId, {
       name,
       price,
+      currencyCode: editCurrencyCode,
       sku: editSku.trim() || undefined,
       description: editDescription.trim() || undefined,
     });
@@ -204,6 +204,18 @@ export const ProductsCatalogManager: React.FC = () => {
               className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/40"
             />
           </div>
+          <div className="lg:col-span-1">
+            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Moeda</label>
+            <select
+              value={currencyCode}
+              onChange={(e) => setCurrencyCode(e.target.value as CurrencyCode)}
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/40"
+              aria-label="Moeda do produto"
+            >
+              <option value="BRL">BRL (R$)</option>
+              <option value="EUR">EUR (€)</option>
+            </select>
+          </div>
           <div className="lg:col-span-2">
             <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">SKU (opcional)</label>
             <input
@@ -255,7 +267,7 @@ export const ProductsCatalogManager: React.FC = () => {
                     <div className="min-w-0">
                       {isEditing ? (
                         <div className="grid grid-cols-1 sm:grid-cols-12 gap-2">
-                          <div className="sm:col-span-5">
+                          <div className="sm:col-span-4">
                             <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">Nome</label>
                             <input
                               value={editName}
@@ -273,6 +285,18 @@ export const ProductsCatalogManager: React.FC = () => {
                             />
                           </div>
                           <div className="sm:col-span-2">
+                            <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">Moeda</label>
+                            <select
+                              value={editCurrencyCode}
+                              onChange={(e) => setEditCurrencyCode(e.target.value as CurrencyCode)}
+                              className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/40"
+                              aria-label="Moeda do produto"
+                            >
+                              <option value="BRL">BRL</option>
+                              <option value="EUR">EUR</option>
+                            </select>
+                          </div>
+                          <div className="sm:col-span-2">
                             <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">SKU</label>
                             <input
                               value={editSku}
@@ -280,7 +304,7 @@ export const ProductsCatalogManager: React.FC = () => {
                               className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/40"
                             />
                           </div>
-                          <div className="sm:col-span-3">
+                          <div className="sm:col-span-2">
                             <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">Descrição</label>
                             <input
                               value={editDescription}
@@ -300,7 +324,7 @@ export const ProductsCatalogManager: React.FC = () => {
                             )}
                           </div>
                           <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
-                            {formatBRL(p.price)}{p.sku ? ` • SKU: ${p.sku}` : ''}{p.description ? ` • ${p.description}` : ''}
+                            {formatCurrency(p.price, p.currencyCode)}{p.sku ? ` • SKU: ${p.sku}` : ''}{p.description ? ` • ${p.description}` : ''}
                           </div>
                         </>
                       )}
@@ -372,4 +396,3 @@ export const ProductsCatalogManager: React.FC = () => {
     </div>
   );
 };
-

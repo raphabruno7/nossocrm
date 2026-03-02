@@ -10,11 +10,9 @@ import {
   ChevronRight,
   MessageSquare,
 } from 'lucide-react';
-import { Board } from '@/types';
+import { Board, CurrencyCode } from '@/types';
 import { useCRM } from '@/context/CRMContext';
-
-// Performance: reuse formatter instances.
-const BRL_CURRENCY_FORMATTER = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+import { currencySymbol, formatCurrency } from '@/lib/currency';
 
 interface BoardStrategyHeaderProps {
   board: Board;
@@ -52,7 +50,7 @@ export const BoardStrategyHeader: React.FC<BoardStrategyHeaderProps> = ({ board 
     if (type === 'currency') {
       return {
         value: totalValue,
-        display: BRL_CURRENCY_FORMATTER.format(totalValue),
+        display: formatCurrency(totalValue, board.currencyCode),
       };
     }
 
@@ -116,6 +114,7 @@ export const BoardStrategyHeader: React.FC<BoardStrategyHeaderProps> = ({ board 
       agentPersona: editedBoard.agentPersona,
       entryTrigger: editedBoard.entryTrigger,
       nextBoardId: editedBoard.nextBoardId,
+      currencyCode: editedBoard.currencyCode,
     });
     setIsEditing(false);
   };
@@ -205,6 +204,24 @@ export const BoardStrategyHeader: React.FC<BoardStrategyHeaderProps> = ({ board 
                     <Target size={12} /> Objetivo (O Alvo)
                   </label>
 
+                  <div className="flex items-center justify-between gap-3">
+                    <label className="text-[10px] text-slate-400 font-medium">Moeda do pipeline</label>
+                    <select
+                      className="bg-transparent text-[10px] font-bold uppercase text-slate-400 focus:text-blue-500 focus:outline-none cursor-pointer"
+                      value={editedBoard.currencyCode || 'BRL'}
+                      onChange={e =>
+                        setEditedBoard({
+                          ...editedBoard,
+                          currencyCode: e.target.value as CurrencyCode,
+                        })
+                      }
+                      aria-label="Moeda do pipeline"
+                    >
+                      <option value="BRL">BRL (R$)</option>
+                      <option value="EUR">EUR (€)</option>
+                    </select>
+                  </div>
+
                   {/* KPI Inputs */}
                   <div className="flex gap-4">
                     <div className="flex-1 bg-slate-50 dark:bg-white/5 rounded-xl p-3 border border-slate-200 dark:border-white/5 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
@@ -233,7 +250,7 @@ export const BoardStrategyHeader: React.FC<BoardStrategyHeaderProps> = ({ board 
                             })
                           }
                         >
-                          <option value="currency">R$ (Valor)</option>
+                          <option value="currency">{currencySymbol(editedBoard.currencyCode)} (Valor)</option>
                           <option value="number"># (Qtd)</option>
                           <option value="percentage">% (Taxa)</option>
                         </select>

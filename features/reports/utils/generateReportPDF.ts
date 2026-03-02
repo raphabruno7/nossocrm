@@ -1,5 +1,6 @@
 import { PeriodFilter, PERIOD_LABELS } from '@/features/dashboard/hooks/useDashboardMetrics';
-import { Deal } from '@/types';
+import type { CurrencyCode, Deal } from '@/types';
+import { formatCurrency as formatMoneyFull, formatCurrencyCompact as formatMoneyCompact } from '@/lib/currency';
 
 interface ReportData {
     pipelineValue: number;
@@ -14,6 +15,7 @@ interface ReportData {
         revenue: number;
     };
     funnelData: { name: string; count: number }[];
+    currencyCode?: CurrencyCode;
 }
 
 // Color Palette
@@ -57,12 +59,8 @@ export const generateReportPDF = async (data: ReportData, period: PeriodFilter, 
     const margin = 15;
     const contentWidth = pageWidth - margin * 2;
 
-    // Helpers
-    const formatCurrency = (value: number) => {
-        if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
-        if (value >= 1000) return `$${(value / 1000).toFixed(0)}k`;
-        return `$${value.toLocaleString('en-US')}`;
-    };
+    const currencyCode = data.currencyCode || 'BRL';
+    const formatCurrency = (value: number) => formatMoneyCompact(value, currencyCode);
 
     // Current date/time
     const now = new Date();
@@ -275,7 +273,7 @@ export const generateReportPDF = async (data: ReportData, period: PeriodFilter, 
             (i + 1).toString(),
             rep.name,
             rep.deals.toString(),
-            formatCurrency(rep.revenue)
+            formatMoneyFull(rep.revenue, currencyCode)
         ])
         : [['—', 'Sem dados no período', '—', '—']];
 

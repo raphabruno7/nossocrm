@@ -5,6 +5,7 @@
 
 import { DealView, Activity } from '@/types';
 import { Decision, AnalyzerResult, AnalyzerConfig, SuggestedAction } from '../types';
+import { formatCurrencyCompact } from '@/lib/currency';
 
 export const stagnantDealsConfig: AnalyzerConfig = {
   id: 'stagnant_deals',
@@ -74,7 +75,7 @@ function generateReasoning(
   }
 
   if (deal.value > 50000) {
-    parts.push(`Com valor de R$ ${deal.value.toLocaleString('pt-BR')}, este deal merece atenção prioritária.`);
+    parts.push(`Com valor de ${formatCurrencyCompact(deal.value, deal.currencyCode)}, este deal merece atenção prioritária.`);
   }
 
   return parts.join(' ');
@@ -228,7 +229,7 @@ export function analyzeStagnantDeals(
         priority,
         category: 'follow_up',
         title: `Deal "${deal.title}" parado há ${daysSinceActivity} dias`,
-        description: `${deal.companyName || 'Empresa não informada'} • R$ ${deal.value.toLocaleString('pt-BR')} • Estágio: ${deal.stageLabel}`,
+        description: `${deal.companyName || 'Empresa não informada'} • ${formatCurrencyCompact(deal.value, deal.currencyCode)} • Estágio: ${deal.stageLabel}`,
         reasoning: generateReasoning(deal, daysSinceActivity, lastActivity),
         dealId: deal.id,
         contactId: deal.contactId,

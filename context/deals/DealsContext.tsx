@@ -265,6 +265,7 @@ export const useDealsView = (
     return rawDeals.map(deal => {
       // Lookups O(1) usando Maps pré-construídos
       const stageLabel = stageLabelMap.get(deal.status) || 'Desconhecido';
+      const currencyCode = boardMap.get(deal.boardId)?.currencyCode || 'BRL';
 
       return {
         ...deal,
@@ -275,7 +276,8 @@ export const useDealsView = (
         contactName: deal.contactId ? (contactMap[deal.contactId]?.name || 'Sem Contato') : 'Sem Contato',
         contactEmail: deal.contactId ? (contactMap[deal.contactId]?.email || '') : '',
         stageLabel,
+        currencyCode,
       };
     });
-  }, [rawDeals, companyMap, contactMap, stageLabelMap]);
+  }, [rawDeals, companyMap, contactMap, stageLabelMap, boardMap]);
 };

@@ -9,6 +9,7 @@ import { PipelineAlertsModal } from './components/PipelineAlertsModal';
 import { useDashboardMetrics, PeriodFilter, COMPARISON_LABELS } from './hooks/useDashboardMetrics';
 import { PeriodFilterSelect } from '@/components/filters/PeriodFilterSelect';
 import { LazyFunnelChart, ChartWrapper } from '@/components/charts';
+import { formatCurrencyCompact } from '@/lib/currency';
 
 
 /**
@@ -88,6 +89,9 @@ const DashboardPage: React.FC = () => {
     activeSnapshotDeals,
   } = useDashboardMetrics(period, selectedBoardId);
 
+  const selectedBoard = React.useMemo(() => boards.find(b => b.id === selectedBoardId), [boards, selectedBoardId]);
+  const currencyCode = selectedBoard?.currencyCode || 'BRL';
+
   // Formatar variações para exibição
   const pipelineChangeInfo = formatChange(changes.pipeline);
   const dealsChangeInfo = formatChange(changes.deals);
@@ -142,7 +146,7 @@ const DashboardPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 shrink-0">
         <StatCard
           title="Pipeline Total"
-          value={`$${pipelineValue.toLocaleString()}`}
+          value={formatCurrencyCompact(pipelineValue, currencyCode)}
           subtext={pipelineChangeInfo.text}
           subtextPositive={pipelineChangeInfo.isPositive}
           icon={DollarSign}
@@ -172,7 +176,7 @@ const DashboardPage: React.FC = () => {
         />
         <StatCard
           title="Receita (Ganha)"
-          value={`$${wonRevenue.toLocaleString()}`}
+          value={formatCurrencyCompact(wonRevenue, currencyCode)}
           subtext={revenueChangeInfo.text}
           subtextPositive={revenueChangeInfo.isPositive}
           icon={TrendingUp}
@@ -254,7 +258,7 @@ const DashboardPage: React.FC = () => {
               Sem mudança de estágio há +10 dias.
             </p>
             <p className="text-xs text-slate-400 mt-1">
-              ${stagnantDealsValue.toLocaleString()} em risco
+              {formatCurrencyCompact(stagnantDealsValue, currencyCode)} em risco
             </p>
           </div>
 
@@ -264,7 +268,7 @@ const DashboardPage: React.FC = () => {
             </h3>
             <div className="flex items-end gap-2">
               <span className="text-2xl font-bold text-slate-900 dark:text-white">
-                ${(avgLTV / 1000).toFixed(1)}k
+                {formatCurrencyCompact(avgLTV, currencyCode)}
               </span>
               <span className="text-xs text-green-500 font-bold mb-1">Médio</span>
             </div>
@@ -331,6 +335,7 @@ const DashboardPage: React.FC = () => {
         onClose={() => setShowPipelineAlerts(false)}
         deals={activeSnapshotDeals}
         activities={activities.map(a => ({ dealId: a.dealId, date: a.date, completed: a.completed }))}
+        currencyCode={currencyCode}
         onNavigateToDeal={(dealId) => {
           setShowPipelineAlerts(false);
           router.push(`/pipeline?deal=${dealId}`);

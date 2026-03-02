@@ -29,6 +29,7 @@ import { useAIDealAnalysis, deriveHealthFromProbability } from '@/features/inbox
 import { useDealNotes } from '@/features/inbox/hooks/useDealNotes';
 import { useDealFiles } from '@/features/inbox/hooks/useDealFiles';
 import { useQuickScripts } from '@/features/inbox/hooks/useQuickScripts';
+import { formatCurrency } from '@/lib/currency';
 
 import { UIChat } from '@/components/ai/UIChat';
 import { CallModal, type CallLogData } from '@/features/inbox/components/CallModal';
@@ -43,11 +44,6 @@ type Tab = 'chat' | 'notas' | 'scripts' | 'arquivos';
 // Performance: reuse Intl formatter instances (avoid creating them per call).
 const PT_BR_DATE_FORMATTER = new Intl.DateTimeFormat('pt-BR');
 const PT_BR_TIME_FORMATTER = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' });
-const BRL_CURRENCY_FORMATTER = new Intl.NumberFormat('pt-BR', {
-  style: 'currency',
-  currency: 'BRL',
-  maximumFractionDigits: 2,
-});
 
 type StageTone = 'blue' | 'violet' | 'amber' | 'green' | 'slate';
 
@@ -338,12 +334,8 @@ function formatAtISO(iso: string): string {
   return `${dd} · ${tt}`;
 }
 
-function formatCurrencyBRL(value: number): string {
-  try {
-    return BRL_CURRENCY_FORMATTER.format(value);
-  } catch {
-    return `R$ ${value.toFixed(2)}`;
-  }
+function currencyLabel(currencyCode: string | null | undefined): string {
+  return currencyCode === 'EUR' ? 'Euro' : 'Real';
 }
 
 function stageToneFromBoardColor(color?: string): StageTone {
@@ -700,7 +692,10 @@ export default function DealCockpitClient({ dealId }: { dealId?: string }) {
   const templateVariables = useMemo(() => {
     const nome = selectedContact?.name?.split(' ')[0]?.trim() || 'Cliente';
     const empresa = selectedDeal?.clientCompanyName?.trim() || selectedDeal?.companyName?.trim() || 'Empresa';
-    const valor = typeof selectedDeal?.value === 'number' ? formatCurrencyBRL(selectedDeal.value) : '';
+    const valor =
+      typeof selectedDeal?.value === 'number'
+        ? formatCurrency(selectedDeal.value, selectedDeal.currencyCode)
+        : '';
     const produto = selectedDeal?.items?.[0]?.name?.trim() || selectedDeal?.title?.trim() || 'Produto';
 
     return {
@@ -1529,7 +1524,7 @@ export default function DealCockpitClient({ dealId }: { dealId?: string }) {
             </div>
 
             <div className="shrink-0 text-right">
-              <div className="text-sm font-semibold text-emerald-300">{formatCurrencyBRL(deal.value ?? 0)}</div>
+              <div className="text-sm font-semibold text-emerald-300">{formatCurrency(deal.value ?? 0, deal.currencyCode)}</div>
               <div className="mt-0.5 text-[11px] text-slate-500">
                 Etapa: <span className="font-semibold text-slate-300">{activeStage?.label ?? '—'}</span>
               </div>
@@ -1824,7 +1819,7 @@ export default function DealCockpitClient({ dealId }: { dealId?: string }) {
                   <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
                     <div className="rounded-lg border border-white/10 bg-white/2 p-2">
                       <div className="text-slate-500">Valor</div>
-                      <div className="mt-0.5 font-semibold text-slate-100">{formatCurrencyBRL(deal.value ?? 0)}</div>
+                      <div className="mt-0.5 font-semibold text-slate-100">{formatCurrency(deal.value ?? 0, deal.currencyCode)}</div>
                     </div>
                     <div className="rounded-lg border border-white/10 bg-white/2 p-2">
                       <div className="text-slate-500">Probabilidade</div>
@@ -2157,7 +2152,7 @@ export default function DealCockpitClient({ dealId }: { dealId?: string }) {
               <Panel
                 title="Execução"
                 icon={<ActivityIcon className="h-4 w-4 text-amber-200" />}
-                right={<Chip tone="success">Real</Chip>}
+                right={<Chip tone="success">{currencyLabel(deal.currencyCode)}</Chip>}
                 className="flex min-h-0 flex-col"
                 bodyClassName="min-h-0 flex-1 overflow-auto"
               >
@@ -2254,7 +2249,7 @@ export default function DealCockpitClient({ dealId }: { dealId?: string }) {
                     <div className="text-[11px] text-slate-500">Deal: {humanizeTestLabel(deal.title) || deal.title}</div>
                   </div>
                 </div>
-                <Chip tone="success">Real</Chip>
+                <Chip tone="success">{currencyLabel(deal.currencyCode)}</Chip>
               </div>
 
               <div className="flex items-center gap-4 px-4 shrink-0">

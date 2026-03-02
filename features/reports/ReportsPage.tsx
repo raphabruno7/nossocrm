@@ -8,6 +8,7 @@ import { LazyRevenueTrendChart, ChartWrapper } from '@/components/charts';
 import { generateReportPDF } from './utils/generateReportPDF';
 import { useCRM } from '@/context/CRMContext';
 import { useAuth } from '@/context/AuthContext';
+import { formatCurrencyCompact } from '@/lib/currency';
 
 /**
  * Componente React `ReportsPage`.
@@ -59,6 +60,7 @@ const ReportsPage: React.FC = () => {
 
   // Extrair meta do board selecionado
   const boardGoal = selectedBoard?.goal;
+  const currencyCode = selectedBoard?.currencyCode || 'BRL';
   const goalType = boardGoal?.type || 'currency';
   const goalTarget = parseFloat(boardGoal?.targetValue || '0') || 0;
   const goalKpi = boardGoal?.kpi || 'Receita';
@@ -91,9 +93,7 @@ const ReportsPage: React.FC = () => {
   const formatGoalValue = useCallback((value: number) => {
     switch (goalType) {
       case 'currency':
-        if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
-        if (value >= 1000) return `$${(value / 1000).toFixed(0)}k`;
-        return `$${value.toLocaleString()}`;
+        return formatCurrencyCompact(value, currencyCode);
       case 'number':
         return value.toFixed(0);
       case 'percentage':
@@ -101,7 +101,7 @@ const ReportsPage: React.FC = () => {
       default:
         return value.toLocaleString();
     }
-  }, [goalType]);
+  }, [currencyCode, goalType]);
 
   // Calcular Performance por Vendedor (Leaderboard)
   const leaderboard = React.useMemo(() => {
@@ -130,11 +130,7 @@ const ReportsPage: React.FC = () => {
   }, [wonDeals]);
 
   // Formatador de moeda
-  const formatCurrency = useCallback((value: number) => {
-    if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
-    if (value >= 1000) return `$${(value / 1000).toFixed(0)}k`;
-    return `$${value.toLocaleString()}`;
-  }, []);
+  const formatMoney = useCallback((value: number) => formatCurrencyCompact(value, currencyCode), [currencyCode]);
 
   const generatedBy = useMemo(() => {
     if (profile?.first_name && profile?.last_name) return `${profile.first_name} ${profile.last_name}`;
@@ -153,6 +149,7 @@ const ReportsPage: React.FC = () => {
         wonDeals,
         changes,
         funnelData,
+        currencyCode,
       },
       period,
       selectedBoard?.name,
@@ -286,7 +283,7 @@ const ReportsPage: React.FC = () => {
             </div>
             <span className="text-xs text-slate-500">Pipeline Total</span>
           </div>
-          <p className="text-2xl font-bold text-slate-900 dark:text-white">{formatCurrency(pipelineValue)}</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white">{formatMoney(pipelineValue)}</p>
           <p className={`text-xs ${changes.pipeline >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
             {changes.pipeline >= 0 ? '+' : ''}{changes.pipeline.toFixed(1)}% {COMPARISON_LABELS[period]}
           </p>
@@ -395,7 +392,7 @@ const ReportsPage: React.FC = () => {
                     <p className="text-xs text-slate-500">{rep.deals} deals</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-bold text-emerald-500">{formatCurrency(rep.revenue)}</p>
+                    <p className="text-sm font-bold text-emerald-500">{formatMoney(rep.revenue)}</p>
                   </div>
                 </div>
               ))

@@ -9,7 +9,7 @@
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys, DEALS_VIEW_KEY } from '../index';
-import { dealsService, contactsService, companiesService, boardStagesService } from '@/lib/supabase';
+import { dealsService, contactsService, companiesService, boardStagesService, boardsService } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import type { Deal, DealView, DealItem } from '@/types';
 
@@ -76,15 +76,18 @@ export const useDealsView = (filters?: DealsFilters) => {
       : [...queryKeys.deals.lists(), 'view'],
     queryFn: async () => {
       // Step 1: Fetch deals and stages first (always needed)
-      const [dealsResult, stagesResult] = await Promise.all([
+      const [dealsResult, stagesResult, boardsResult] = await Promise.all([
         dealsService.getAll(),
         boardStagesService.getAll(),
+        boardsService.getAll(),
       ]);
 
       if (dealsResult.error) throw dealsResult.error;
 
       const deals = dealsResult.data || [];
       const stages = stagesResult.data || [];
+      if (boardsResult.error) console.warn('[useDealsView] Failed to fetch boards for currency mapping:', boardsResult.error);
+      const boards = boardsResult.data || [];
 
       // Step 2: Extract unique IDs referenced by deals (avoid fetching unused data)
       const contactIds = deals.map(d => d.contactId).filter(Boolean);
@@ -103,6 +106,7 @@ export const useDealsView = (filters?: DealsFilters) => {
       const contactMap = new Map(contacts.map(c => [c.id, c]));
       const companyMap = new Map(companies.map(c => [c.id, c]));
       const stageMap = new Map(stages.map(s => [s.id, s.label || s.name]));
+      const boardCurrencyMap = new Map(boards.map(b => [b.id, b.currencyCode || 'BRL']));
 
       // Enrich deals with company/contact names and stageLabel
       let enrichedDeals: DealView[] = deals.map(deal => {
@@ -114,6 +118,7 @@ export const useDealsView = (filters?: DealsFilters) => {
           contactName: contact?.name || 'Sem contato',
           contactEmail: contact?.email || '',
           stageLabel: stageMap.get(deal.status) || 'Estágio não identificado',
+          currencyCode: boardCurrencyMap.get(deal.boardId) || 'BRL',
         };
       });
 
@@ -174,15 +179,18 @@ export const useDealsByBoard = (boardId: string) => {
     queryKey: [...queryKeys.deals.lists(), 'view'],
     queryFn: async () => {
       // Step 1: Fetch deals and stages first
-      const [dealsResult, stagesResult] = await Promise.all([
+      const [dealsResult, stagesResult, boardsResult] = await Promise.all([
         dealsService.getAll(),
         boardStagesService.getAll(),
+        boardsService.getAll(),
       ]);
 
       if (dealsResult.error) throw dealsResult.error;
 
       const deals = dealsResult.data || [];
       const stages = stagesResult.data || [];
+      if (boardsResult.error) console.warn('[useDealsByBoard] Failed to fetch boards for currency mapping:', boardsResult.error);
+      const boards = boardsResult.data || [];
 
       // Step 2: Extract unique IDs referenced by deals
       const contactIds = deals.map(d => d.contactId).filter(Boolean);
@@ -201,6 +209,7 @@ export const useDealsByBoard = (boardId: string) => {
       const contactMap = new Map(contacts.map(c => [c.id, c]));
       const companyMap = new Map(companies.map(c => [c.id, c]));
       const stageMap = new Map(stages.map(s => [s.id, s.label || s.name]));
+      const boardCurrencyMap = new Map(boards.map(b => [b.id, b.currencyCode || 'BRL']));
 
       // Enrich ALL deals (filtering happens in select)
       const enrichedDeals: DealView[] = deals.map(deal => {
@@ -212,6 +221,7 @@ export const useDealsByBoard = (boardId: string) => {
           contactName: contact?.name || 'Sem contato',
           contactEmail: contact?.email || '',
           stageLabel: stageMap.get(deal.status) || 'Estágio não identificado',
+          currencyCode: boardCurrencyMap.get(deal.boardId) || 'BRL',
         };
       });
       return enrichedDeals;

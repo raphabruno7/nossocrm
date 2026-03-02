@@ -22,6 +22,7 @@ import { useHiddenSuggestionIds, useRecordSuggestionInteraction } from '@/lib/qu
 import { SuggestionType } from '@/lib/supabase/aiSuggestions';
 import { isDebugMode, generateFakeContacts, fakeDeal } from '@/lib/debug';
 import { supabase } from '@/lib/supabase/client';
+import { formatCurrencyCompact } from '@/lib/currency';
 
 // Tipos para sugestões de IA (BIRTHDAY removido - será implementado em widget separado)
 export type AISuggestionType = 'UPSELL' | 'RESCUE' | 'STALLED';
@@ -266,7 +267,7 @@ export const useInboxController = () => {
           id,
           type: 'STALLED',
           title: `Negócio Parado (${daysSinceUpdate}d)`,
-          description: `${deal.title} - R$ ${deal.value.toLocaleString('pt-BR')} • ${deal.probability}% probabilidade`,
+          description: `${deal.title} - ${formatCurrencyCompact(deal.value, deal.currencyCode)} • ${deal.probability}% probabilidade`,
           priority: score > 30 ? 'high' : score > 15 ? 'medium' : 'low',
           data: { deal },
           createdAt: nowIso,
@@ -287,7 +288,7 @@ export const useInboxController = () => {
           id,
           type: 'UPSELL',
           title: `Oportunidade de Upsell`,
-          description: `${deal.companyName} fechou há ${daysSinceClose} dias • R$ ${deal.value.toLocaleString('pt-BR')}`,
+          description: `${deal.companyName} fechou há ${daysSinceClose} dias • ${formatCurrencyCompact(deal.value, deal.currencyCode)}`,
           priority: score > 25 ? 'high' : score > 10 ? 'medium' : 'low',
           data: { deal },
           createdAt: nowIso,

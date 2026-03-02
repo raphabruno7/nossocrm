@@ -38,6 +38,7 @@ import {
 import { StageProgressBar } from '../StageProgressBar';
 import { ActivityRow } from '@/features/activities/components/ActivityRow';
 import { formatPriorityPtBr } from '@/lib/utils/priority';
+import { currencySymbol, formatCurrency } from '@/lib/currency';
 
 interface DealDetailModalProps {
   dealId: string | null;
@@ -423,7 +424,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
 
                 {isEditingValue ? (
                   <div className="flex gap-2 items-center">
-                    <span className="text-lg font-mono font-bold text-slate-500">$</span>
+                    <span className="text-lg font-mono font-bold text-slate-500">{currencySymbol(deal.currencyCode)}</span>
                     <input
                       autoFocus
                       type="number"
@@ -446,7 +447,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                     className="text-lg text-primary-600 dark:text-primary-400 font-mono font-bold cursor-pointer hover:underline decoration-dashed underline-offset-4"
                     title="Clique para editar valor"
                   >
-                    ${deal.value.toLocaleString()}
+                    {formatCurrency(deal.value, deal.currencyCode)}
                   </p>
                 )}
               </div>
@@ -966,10 +967,10 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                                   {item.quantity}
                                 </td>
                                 <td className="px-4 py-3 text-right text-slate-600 dark:text-slate-300">
-                                  ${item.price.toLocaleString()}
+                                  {formatCurrency(item.price, deal.currencyCode)}
                                 </td>
                                 <td className="px-4 py-3 text-right font-bold text-slate-900 dark:text-white">
-                                  ${(item.price * item.quantity).toLocaleString()}
+                                  {formatCurrency(item.price * item.quantity, deal.currencyCode)}
                                 </td>
                                 <td className="px-4 py-3 text-center">
                                   <button
@@ -992,7 +993,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                               Total do Pedido
                             </td>
                             <td className="px-4 py-3 text-right font-bold text-primary-600 dark:text-primary-400 text-lg">
-                              ${deal.value.toLocaleString()}
+                              {formatCurrency(deal.value, deal.currencyCode)}
                             </td>
                             <td></td>
                           </tr>

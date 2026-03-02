@@ -137,6 +137,8 @@ CREATE TABLE IF NOT EXISTS public.boards (
     name TEXT NOT NULL,
     description TEXT,
     type TEXT DEFAULT 'SALES',
+    -- Currency per board/pipeline (no conversion)
+    currency_code TEXT NOT NULL DEFAULT 'BRL',
     is_default BOOLEAN DEFAULT false,
     template TEXT,
     linked_lifecycle_stage TEXT,
@@ -157,6 +159,20 @@ CREATE TABLE IF NOT EXISTS public.boards (
     owner_id UUID REFERENCES public.profiles(id),
     organization_id UUID REFERENCES public.organizations(id) ON DELETE CASCADE
 );
+
+-- Ensure currency_code stays within allowed set.
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'boards_currency_code_chk'
+  ) THEN
+    ALTER TABLE public.boards
+    ADD CONSTRAINT boards_currency_code_chk
+    CHECK (currency_code IN ('BRL', 'EUR'));
+  END IF;
+END $$;
 
 -- Unique per organization for active (non-deleted) boards.
 CREATE UNIQUE INDEX IF NOT EXISTS idx_boards_org_key_unique
@@ -264,6 +280,7 @@ CREATE TABLE IF NOT EXISTS public.products (
     name TEXT NOT NULL,
     description TEXT,
     price NUMERIC NOT NULL DEFAULT 0,
+    currency_code TEXT NOT NULL DEFAULT 'BRL',
     sku TEXT,
     active BOOLEAN DEFAULT true,
     created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -271,6 +288,19 @@ CREATE TABLE IF NOT EXISTS public.products (
     owner_id UUID REFERENCES public.profiles(id),
     organization_id UUID REFERENCES public.organizations(id) ON DELETE CASCADE
 );
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'products_currency_code_chk'
+  ) THEN
+    ALTER TABLE public.products
+    ADD CONSTRAINT products_currency_code_chk
+    CHECK (currency_code IN ('BRL', 'EUR'));
+  END IF;
+END $$;
 
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 

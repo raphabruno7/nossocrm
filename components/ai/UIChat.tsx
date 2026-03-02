@@ -7,6 +7,7 @@ import { Send, Loader2, Bot, User, Sparkles, Wrench, X, MessageCircle, Minimize2
 import { useAI } from '@/context/AIContext';
 import dynamic from 'next/dynamic';
 import remarkGfm from 'remark-gfm';
+import { formatCurrency } from '@/lib/currency';
 
 // Lazy load react-markdown para reduzir bundle inicial em ~35KB
 // O chat geralmente inicia minimizado (startMinimized={true}), então o markdown
@@ -194,6 +195,35 @@ export function UIChat({
         const recordDeal = (d: any) => {
             if (d?.id && d?.title && !map.has(d.id)) {
                 map.set(d.id, d.title);
+            }
+        };
+
+        for (const m of messages) {
+            for (const p of (m.parts as any[])) {
+                const type = (p?.type as string) || '';
+                const isToolPart = type.startsWith('tool-') || type === 'dynamic-tool' || type === 'tool-invocation';
+                if (!isToolPart) continue;
+
+                const output = p?.output;
+                if (!output) continue;
+
+                if (Array.isArray(output?.deals)) {
+                    for (const d of output.deals) recordDeal(d);
+                }
+                // getDealDetails-like
+                recordDeal(output);
+            }
+        }
+
+        return map;
+    }, [messages]);
+
+    const dealCurrencyById = useMemo(() => {
+        const map = new Map<string, string>();
+
+        const recordDeal = (d: any) => {
+            if (d?.id && typeof d?.currencyCode === 'string' && !map.has(d.id)) {
+                map.set(d.id, d.currencyCode);
             }
         };
 
@@ -509,7 +539,10 @@ export function UIChat({
             case 'markDealAsWon': {
                 const title = input?.dealTitle || dealTitleFromId(input?.dealId);
                 if (title) lines.push(`Deal: ${title}`);
-                if (input?.wonValue !== undefined) lines.push(`Valor final: R$ ${Number(input.wonValue).toLocaleString('pt-BR')}`);
+                if (input?.wonValue !== undefined) {
+                    const dealCurrency = input?.currencyCode || dealCurrencyById.get(input?.dealId);
+                    lines.push(`Valor final: ${formatCurrency(Number(input.wonValue), dealCurrency)}`);
+                }
                 break;
             }
             case 'moveDeal': {

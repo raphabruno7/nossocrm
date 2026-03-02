@@ -8,6 +8,7 @@ import { useToast } from '@/context/ToastContext';
 import { Modal } from '@/components/ui/Modal';
 import { MODAL_FOOTER_CLASS } from '@/components/ui/modalStyles';
 import { slugify } from '@/lib/utils/slugify';
+import { formatCurrency } from '@/lib/currency';
 
 interface CreateBoardModalProps {
   isOpen: boolean;
@@ -519,7 +520,7 @@ export const CreateBoardModal: React.FC<CreateBoardModalProps> = ({
                     .filter(p => p.active !== false)
                     .map(p => (
                       <option key={p.id} value={p.id}>
-                        {p.name} — R$ {Number(p.price ?? 0).toLocaleString('pt-BR')}
+                        {p.name} — {formatCurrency(Number(p.price ?? 0), p.currencyCode)}
                       </option>
                     ))}
                 </select>

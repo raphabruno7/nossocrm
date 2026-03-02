@@ -329,6 +329,7 @@ const CRMInnerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         contactName: deal.contactId ? (contactMap[deal.contactId]?.name || 'Sem Contato') : 'Sem Contato',
         contactEmail: deal.contactId ? (contactMap[deal.contactId]?.email || '') : '',
         stageLabel: stage?.label || 'Desconhecido',
+        currencyCode: board?.currencyCode || 'BRL',
         owner: (deal.ownerId === profile?.id || deal.ownerId === user?.id) ? {
           name: profile?.nickname || profile?.first_name || (user?.email?.split('@')[0]) || 'Eu',
           avatar: profile?.avatar_url || ''

@@ -38,6 +38,7 @@ import { useDealFiles } from '../hooks/useDealFiles';
 import { useQuickScripts } from '../hooks/useQuickScripts';
 import { useAI } from '@/context/AIContext';
 import { CallModal, CallLogData } from './CallModal';
+import { formatCurrency } from '@/lib/currency';
 import { ScriptEditorModal, ScriptFormData } from './ScriptEditorModal';
 import { ScheduleModal, ScheduleData, ScheduleType } from './ScheduleModal';
 import { generateSalesScript } from '@/lib/ai/tasksClient';
@@ -1092,7 +1093,7 @@ export const FocusContextPanel: React.FC<FocusContextPanelProps> = ({
                                 <div>
                                     <span className="text-slate-600">Valor</span>
                                     <p className="text-emerald-400 font-semibold">
-                                        R$ {deal.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                        {formatCurrency(deal.value, (deal as any).currencyCode, { minimumFractionDigits: 2 })}
                                     </p>
                                 </div>
                                 <div>

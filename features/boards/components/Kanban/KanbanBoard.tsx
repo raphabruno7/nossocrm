@@ -3,6 +3,7 @@ import { DealView, BoardStage } from '@/types';
 import { DealCard } from './DealCard';
 import { isDealRotting, getActivityStatus } from '@/features/boards/hooks/useBoardsController';
 import { MoveToStageModal } from '../Modals/MoveToStageModal';
+import { formatCurrency } from '@/lib/currency';
 
 import { useCRM } from '@/context/CRMContext';
 
@@ -114,6 +115,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   onMoveDealToStage,
 }) => {
   const { lifecycleStages } = useCRM();
+  const boardCurrencyCode = filteredDeals[0]?.currencyCode || 'BRL';
   const [dragOverStage, setDragOverStage] = useState<string | null>(null);
   
   // State for move-to-stage modal (keyboard accessibility alternative to drag-and-drop)
@@ -248,7 +250,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
               <div className="text-xs text-slate-500 dark:text-slate-400 font-medium text-right">
                 Total:{' '}
                 <span className="text-slate-900 dark:text-white font-mono">
-                  ${stageValue.toLocaleString()}
+                  {formatCurrency(stageValue, boardCurrencyCode)}
                 </span>
               </div>
             </div>

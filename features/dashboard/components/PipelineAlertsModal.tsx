@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, AlertTriangle, Clock, Calendar, TrendingUp, ChevronRight } from 'lucide-react';
-import { Deal } from '@/types';
+import type { CurrencyCode, Deal } from '@/types';
+import { formatCurrencyCompact } from '@/lib/currency';
 
 interface PipelineAlert {
   type: 'stagnant' | 'no-activity' | 'ready-to-close';
@@ -17,6 +18,7 @@ interface PipelineAlertsModalProps {
   deals: Deal[];
   activities: { dealId: string; date: string; completed: boolean }[];
   onNavigateToDeal: (dealId: string) => void;
+  currencyCode?: CurrencyCode;
 }
 
 /**
@@ -43,6 +45,7 @@ export const PipelineAlertsModal: React.FC<PipelineAlertsModalProps> = ({
   deals,
   activities,
   onNavigateToDeal,
+  currencyCode = 'BRL',
 }) => {
   if (!isOpen) return null;
 
@@ -187,7 +190,7 @@ export const PipelineAlertsModal: React.FC<PipelineAlertsModalProps> = ({
                           {deal.title}
                         </p>
                         <p className="text-sm text-slate-500 dark:text-slate-400">
-                          ${deal.value.toLocaleString()} • {deal.probability}% probabilidade
+                          {formatCurrencyCompact(deal.value, currencyCode)} • {deal.probability}% probabilidade
                         </p>
                       </div>
                       <ChevronRight 

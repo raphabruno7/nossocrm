@@ -67,6 +67,13 @@ export type OrganizationId = string;
 export type ClientCompanyId = string;
 
 // =============================================================================
+// Currencies
+// =============================================================================
+
+export const CURRENCY_CODES = ['BRL', 'EUR'] as const;
+export type CurrencyCode = (typeof CURRENCY_CODES)[number];
+
+// =============================================================================
 // Core Types
 // =============================================================================
 
@@ -180,6 +187,8 @@ export interface Product {
   name: string;
   description?: string;
   price: number;
+  /** Moeda do preço do produto (BRL/EUR). */
+  currencyCode?: CurrencyCode; // Defaults to BRL
   sku?: string;
   /** Se está ativo no catálogo (itens inativos não devem aparecer no dropdown do deal). */
   active?: boolean;
@@ -250,6 +259,8 @@ export interface DealView extends Deal {
   contactEmail: string;
   /** Nome/label do estágio atual (resolvido a partir do status UUID) */
   stageLabel: string;
+  /** Moeda derivada do board/pipeline (para formatação). */
+  currencyCode?: CurrencyCode;
 
   // @deprecated - Use clientCompanyName instead
   companyName?: string;
@@ -330,6 +341,8 @@ export interface Board {
   lostStayInStage?: boolean; // Se true, "Arquiva" na etapa atual (status Lost) em vez de mover
   /** Produto padrão sugerido para deals desse board (opcional). */
   defaultProductId?: string;
+  /** Moeda do pipeline/board (BRL/EUR). */
+  currencyCode?: CurrencyCode; // Defaults to BRL
   stages: BoardStage[];
   isDefault?: boolean;
   template?: 'PRE_SALES' | 'SALES' | 'ONBOARDING' | 'CS' | 'CUSTOM'; // Template usado para criar este board

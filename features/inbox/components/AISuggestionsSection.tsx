@@ -1,6 +1,6 @@
 import React from 'react';
 import { AISuggestion, AISuggestionType } from '../hooks/useInboxController';
-import { 
+import {
   Sparkles, 
   TrendingUp, 
   AlertTriangle, 
@@ -10,6 +10,7 @@ import {
   ChevronRight,
   Zap
 } from 'lucide-react';
+import { formatCurrency } from '@/lib/currency';
 
 interface AISuggestionsSectionProps {
   suggestions: AISuggestion[];
@@ -137,7 +138,7 @@ export const AISuggestionsSection: React.FC<AISuggestionsSectionProps> = ({
                   {/* Deal/Contact info */}
                   {suggestion.data.deal && (
                     <div className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-                      💰 R$ {suggestion.data.deal.value.toLocaleString('pt-BR')}
+                      💰 {formatCurrency(suggestion.data.deal.value, (suggestion.data.deal as any).currencyCode)}
                     </div>
                   )}
                 </div>
