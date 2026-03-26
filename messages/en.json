@@ -1,0 +1,69 @@
+{
+  "login": {
+    "title": "Welcome back",
+    "subtitle": "Sign in to your account to continue.",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "copyright": "Arcus CRM. All rights reserved.",
+    "errorNoSupabase": "Supabase not configured. Please set up environment variables."
+  },
+  "setup": {
+    "title": "Welcome to Arcus CRM",
+    "subtitle": "Let's set up your workspace.",
+    "checking": "Checking configuration…",
+    "companyName": "Company Name",
+    "adminEmail": "Admin Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "submit": "Get Started",
+    "requirements": "Requirements:",
+    "reqMinLength": "At least 6 characters",
+    "reqLowercase": "Lowercase letter",
+    "reqUppercase": "Uppercase letter",
+    "reqDigit": "Number",
+    "passwordsNoMatch": "Passwords do not match",
+    "passwordsMatch": "✓ Passwords match",
+    "errorPasswordReqs": "Password does not meet the minimum requirements",
+    "errorPasswordsNoMatch": "Passwords do not match",
+    "copyright": "Arcus CRM. All rights reserved."
+  },
+  "nav": {
+    "inbox": "Inbox",
+    "dashboard": "Overview",
+    "boards": "Boards",
+    "contacts": "Contacts",
+    "activities": "Activities",
+    "reports": "Reports",
+    "settings": "Settings",
+    "collapseMenu": "Collapse Menu",
+    "expandMenu": "Expand Menu",
+    "editProfile": "Edit Profile",
+    "signOut": "Sign out"
+  },
+  "pwa": {
+    "install": "Install Arcus CRM"
+  },
+  "consent": {
+    "title": "Required Consents",
+    "subtitle": "To continue using Arcus CRM, we need your consent.",
+    "terms_title": "Terms of Use",
+    "terms_desc": "I have read and accept the Terms of Use of Arcus CRM.",
+    "privacy_title": "Privacy Policy",
+    "privacy_desc": "I have read and accept the Privacy Policy, which explains how your data is collected and used.",
+    "data_processing_title": "Data Processing",
+    "data_processing_desc": "I authorize the processing of my personal data for use of the platform.",
+    "marketing_title": "Marketing Communications",
+    "marketing_desc": "I agree to receive promotional communications and news by email.",
+    "analytics_title": "Usage Analytics",
+    "analytics_desc": "I authorize the collection of usage data to improve the platform.",
+    "required": "required",
+    "optional": "optional",
+    "acceptAll": "Accept All",
+    "acceptSelected": "Accept Selected"
+  },
+  "language": {
+    "toggle": "PT",
+    "current": "EN"
+  }
+}

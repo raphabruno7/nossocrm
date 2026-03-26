@@ -6,11 +6,9 @@ import { supabase } from '@/lib/supabase'
 import { getErrorMessage } from '@/lib/utils/errorUtils'
 import { useAuth } from '@/context/AuthContext'
 import { Loader2, Building2, User, Lock, ArrowRight } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { LanguageToggle } from '@/components/LanguageToggle'
 
-/**
- * Componente React `SetupPage`.
- * @returns {Element} Retorna um valor do tipo `Element`.
- */
 export default function SetupPage() {
   const [companyName, setCompanyName] = useState('')
   const [email, setEmail] = useState('')
@@ -22,16 +20,14 @@ export default function SetupPage() {
 
   const router = useRouter()
   const { checkInitialization } = useAuth()
+  const t = useTranslations('setup')
 
-  // Se a instância já estiver inicializada, não faz sentido exibir o wizard de setup.
-  // Mantemos a rota pública, mas redirecionamos o usuário para login (ou dashboard se já estiver logado).
   React.useEffect(() => {
     let cancelled = false
 
     const run = async () => {
       try {
         if (!supabase) {
-          // Sem Supabase configurado localmente: não dá pra checar init. Apenas mostra a UI.
           return
         }
 
@@ -53,7 +49,6 @@ export default function SetupPage() {
         }
       } catch (e) {
         console.error('Setup init check error:', e)
-        // Em caso de erro, não bloqueia o setup.
       } finally {
         if (!cancelled) setCheckingInit(false)
       }
@@ -80,12 +75,12 @@ export default function SetupPage() {
     if (checkingInit) return
 
     if (!isPasswordValid) {
-      setError('A senha não atende aos requisitos mínimos')
+      setError(t('errorPasswordReqs'))
       return
     }
 
     if (!passwordsMatch) {
-      setError('As senhas não coincidem')
+      setError(t('errorPasswordsNoMatch'))
       return
     }
 
@@ -128,24 +123,28 @@ export default function SetupPage() {
       </div>
 
       <div className="max-w-md w-full relative z-10 px-4">
+        <div className="flex justify-end mb-4">
+          <LanguageToggle />
+        </div>
+
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-slate-900 dark:text-white font-display tracking-tight mb-2">
-            Bem-vindo ao Arcus CRM
+            {t('title')}
           </h1>
-          <p className="text-slate-500 dark:text-slate-400">Vamos preparar seu ambiente de trabalho.</p>
+          <p className="text-slate-500 dark:text-slate-400">{t('subtitle')}</p>
         </div>
 
         <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-white/10 rounded-2xl shadow-xl p-8 backdrop-blur-sm">
           {checkingInit ? (
             <div className="flex items-center justify-center py-10 text-slate-600 dark:text-slate-300">
               <Loader2 className="animate-spin h-5 w-5 mr-2" />
-              Verificando configuração…
+              {t('checking')}
             </div>
           ) : (
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="company-name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                Nome da Empresa
+                {t('companyName')}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -167,7 +166,7 @@ export default function SetupPage() {
 
             <div>
               <label htmlFor="email-address" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                Email do Administrador
+                {t('adminEmail')}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -190,7 +189,7 @@ export default function SetupPage() {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                Senha
+                {t('password')}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -213,19 +212,19 @@ export default function SetupPage() {
 
               {password.length > 0 && (
                 <div id="password-requirements" className="mt-2 space-y-1">
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Requisitos:</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{t('requirements')}</p>
                   <div className="grid grid-cols-2 gap-1 text-xs">
                     <span className={passwordRequirements.minLength ? 'text-green-500' : 'text-slate-400'}>
-                      {passwordRequirements.minLength ? '✓' : '○'} Mínimo 6 caracteres
+                      {passwordRequirements.minLength ? '✓' : '○'} {t('reqMinLength')}
                     </span>
                     <span className={passwordRequirements.hasLowercase ? 'text-green-500' : 'text-slate-400'}>
-                      {passwordRequirements.hasLowercase ? '✓' : '○'} Letra minúscula
+                      {passwordRequirements.hasLowercase ? '✓' : '○'} {t('reqLowercase')}
                     </span>
                     <span className={passwordRequirements.hasUppercase ? 'text-green-500' : 'text-slate-400'}>
-                      {passwordRequirements.hasUppercase ? '✓' : '○'} Letra maiúscula
+                      {passwordRequirements.hasUppercase ? '✓' : '○'} {t('reqUppercase')}
                     </span>
                     <span className={passwordRequirements.hasDigit ? 'text-green-500' : 'text-slate-400'}>
-                      {passwordRequirements.hasDigit ? '✓' : '○'} Número
+                      {passwordRequirements.hasDigit ? '✓' : '○'} {t('reqDigit')}
                     </span>
                   </div>
                 </div>
@@ -234,7 +233,7 @@ export default function SetupPage() {
 
             <div>
               <label htmlFor="confirm-password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                Confirmar Senha
+                {t('confirmPassword')}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -262,9 +261,9 @@ export default function SetupPage() {
               </div>
 
               {confirmPassword.length > 0 && !passwordsMatch && (
-                <p className="mt-1 text-xs text-red-500">As senhas não coincidem</p>
+                <p className="mt-1 text-xs text-red-500">{t('passwordsNoMatch')}</p>
               )}
-              {passwordsMatch && <p className="mt-1 text-xs text-green-500">✓ Senhas coincidem</p>}
+              {passwordsMatch && <p className="mt-1 text-xs text-green-500">{t('passwordsMatch')}</p>}
             </div>
 
             {error && (
@@ -286,7 +285,7 @@ export default function SetupPage() {
                 <Loader2 className="animate-spin h-5 w-5" />
               ) : (
                 <>
-                  Começar Agora
+                  {t('submit')}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </>
               )}
@@ -296,7 +295,7 @@ export default function SetupPage() {
         </div>
 
         <p className="mt-8 text-center text-xs text-slate-400 dark:text-slate-500">
-          &copy; {new Date().getFullYear()} Arcus CRM. Todos os direitos reservados.
+          &copy; {new Date().getFullYear()} {t('copyright')}
         </p>
       </div>
     </div>

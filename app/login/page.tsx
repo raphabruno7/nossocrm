@@ -5,11 +5,9 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { getErrorMessage } from '@/lib/utils/errorUtils'
 import { Loader2, Mail, Lock, ArrowRight } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { LanguageToggle } from '@/components/LanguageToggle'
 
-/**
- * Componente React `LoginPage`.
- * @returns {Element} Retorna um valor do tipo `Element`.
- */
 export default function LoginPage() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -17,6 +15,7 @@ export default function LoginPage() {
     const [error, setError] = useState<string | null>(null)
     const router = useRouter()
     const supabase = createClient()
+    const t = useTranslations('login')
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -25,7 +24,7 @@ export default function LoginPage() {
 
         try {
             if (!supabase) {
-                throw new Error('Supabase não configurado. Configure as variáveis de ambiente.')
+                throw new Error(t('errorNoSupabase'))
             }
 
             const { error } = await supabase.auth.signInWithPassword({
@@ -51,12 +50,16 @@ export default function LoginPage() {
             </div>
 
             <div className="max-w-md w-full relative z-10 px-4">
+                <div className="flex justify-end mb-4">
+                    <LanguageToggle />
+                </div>
+
                 <div className="text-center mb-8">
                     <h1 className="text-4xl font-bold text-slate-900 dark:text-white font-display tracking-tight mb-2">
-                        Bem-vindo de volta
+                        {t('title')}
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400">
-                        Entre na sua conta para continuar.
+                        {t('subtitle')}
                     </p>
                 </div>
 
@@ -64,7 +67,7 @@ export default function LoginPage() {
                     <form className="space-y-6" onSubmit={handleSubmit}>
                         <div>
                             <label htmlFor="email-address" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                                Email
+                                {t('email')}
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -88,7 +91,7 @@ export default function LoginPage() {
 
                         <div>
                             <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                                Senha
+                                {t('password')}
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -130,7 +133,7 @@ export default function LoginPage() {
                                 <Loader2 className="animate-spin h-5 w-5" />
                             ) : (
                                 <>
-                                    Entrar
+                                    {t('submit')}
                                     <ArrowRight className="ml-2 h-4 w-4" />
                                 </>
                             )}
@@ -139,7 +142,7 @@ export default function LoginPage() {
                 </div>
 
                 <p className="mt-8 text-center text-xs text-slate-400 dark:text-slate-500">
-                    &copy; {new Date().getFullYear()} Arcus CRM. Todos os direitos reservados.
+                    &copy; {new Date().getFullYear()} {t('copyright')}
                 </p>
             </div>
         </div>

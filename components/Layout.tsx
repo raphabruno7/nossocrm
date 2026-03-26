@@ -59,6 +59,8 @@ import { BottomNav, MoreMenuSheet, NavigationRail } from '@/components/navigatio
 import { UIChat } from './ai/UIChat';
 
 import { NotificationPopover } from './notifications/NotificationPopover';
+import { useTranslations } from 'next-intl';
+import { LanguageToggle } from './LanguageToggle';
 
 /**
  * Props do componente Layout
@@ -136,6 +138,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { darkMode, toggleDarkMode } = useTheme();
   const { isGlobalAIOpen, setIsGlobalAIOpen, sidebarCollapsed, setSidebarCollapsed } = useCRM();
   const { user, loading, profile, signOut } = useAuth();
+  const t = useTranslations('nav');
   const router = useRouter();
   const pathname = usePathname();
   const { mode } = useResponsiveMode();
@@ -252,7 +255,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <button
               onClick={() => setSidebarCollapsed(true)}
               className="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors p-1 rounded-md hover:bg-slate-100 dark:hover:bg-white/5"
-              title="Recolher Menu"
+              title={t('collapseMenu')}
             >
               <PanelLeftClose size={20} />
             </button>
@@ -261,13 +264,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
         <nav className={`flex-1 p-4 space-y-2 flex flex-col ${sidebarCollapsed ? 'items-center px-2' : ''}`} aria-label="Navegação do sistema">
           {[
-            { to: '/inbox', icon: Inbox, label: 'Inbox', prefetch: 'inbox' as const },
-            { to: '/dashboard', icon: LayoutDashboard, label: 'Visão Geral', prefetch: 'dashboard' as const },
-            { to: '/boards', icon: KanbanSquare, label: 'Boards', prefetch: 'boards' as const },
-            { to: '/contacts', icon: Users, label: 'Contatos', prefetch: 'contacts' as const },
-            { to: '/activities', icon: CheckSquare, label: 'Atividades', prefetch: 'activities' as const },
-            { to: '/reports', icon: BarChart3, label: 'Relatórios', prefetch: 'reports' as const },
-            { to: '/settings', icon: Settings, label: 'Configurações', prefetch: 'settings' as const },
+            { to: '/inbox', icon: Inbox, label: t('inbox'), prefetch: 'inbox' as const },
+            { to: '/dashboard', icon: LayoutDashboard, label: t('dashboard'), prefetch: 'dashboard' as const },
+            { to: '/boards', icon: KanbanSquare, label: t('boards'), prefetch: 'boards' as const },
+            { to: '/contacts', icon: Users, label: t('contacts'), prefetch: 'contacts' as const },
+            { to: '/activities', icon: CheckSquare, label: t('activities'), prefetch: 'activities' as const },
+            { to: '/reports', icon: BarChart3, label: t('reports'), prefetch: 'reports' as const },
+            { to: '/settings', icon: Settings, label: t('settings'), prefetch: 'settings' as const },
           ].map((item) => {
             if (sidebarCollapsed) {
               return (
@@ -314,7 +317,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <button
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
               className="flex items-center justify-center w-10 h-10 p-2 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
-              title="Expandir Menu"
+              title={t('expandMenu')}
             >
               <PanelLeftOpen size={20} />
             </button>
@@ -387,7 +390,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       className="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-lg transition-colors focus-visible-ring"
                     >
                       <User className="w-4 h-4 text-slate-400" />
-                      Editar Perfil
+                      {t('editProfile')}
                     </Link>
                     <button
                       onClick={() => {
@@ -397,7 +400,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors focus-visible-ring"
                     >
                       <LogOut className="w-4 h-4" />
-                      Sair da conta
+                      {t('signOut')}
                     </button>
                   </div>
                 </div>
@@ -421,6 +424,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           {/* Header */}
           <header className="h-16 glass border-b border-[var(--color-border-subtle)] flex items-center justify-end px-6 z-40 shrink-0" role="banner">
             <div className="flex items-center gap-4">
+              <LanguageToggle />
               <button
                 type="button"
                 onClick={() => setIsGlobalAIOpen(!isGlobalAIOpen)}

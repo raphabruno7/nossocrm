@@ -3,9 +3,11 @@
 import React from 'react';
 import { Download, X } from 'lucide-react';
 import { useInstallState } from './useInstallState';
+import { useTranslations } from 'next-intl';
 
 export function InstallBanner() {
   const { isEligible, isDismissed, canPrompt, platformHint, promptInstall, dismiss } = useInstallState();
+  const t = useTranslations('pwa');
 
   if (!isEligible || isDismissed) return null;
 
@@ -18,11 +20,11 @@ export function InstallBanner() {
           </div>
           <div className="min-w-0 flex-1">
             <div className="text-sm font-semibold text-slate-900 dark:text-white">
-              Instale o Arcus CRM
+              {t('install')}
             </div>
             <div className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
               {platformHint === 'ios'
-                ? 'No iPhone/iPad: toque em Compartilhar → “Adicionar à Tela de Início”.'
+                ? 'No iPhone/iPad: toque em Compartilhar → "Adicionar à Tela de Início".'
                 : canPrompt
                   ? 'Instale para abrir mais rápido e usar como app.'
                   : 'Instale para abrir mais rápido e usar como app.'}
@@ -70,4 +72,3 @@ export function InstallBanner() {
     </div>
   );
 }
-

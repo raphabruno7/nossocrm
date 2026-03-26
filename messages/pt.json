@@ -1,0 +1,69 @@
+{
+  "login": {
+    "title": "Bem-vindo de volta",
+    "subtitle": "Entre na sua conta para continuar.",
+    "email": "Email",
+    "password": "Senha",
+    "submit": "Entrar",
+    "copyright": "Arcus CRM. Todos os direitos reservados.",
+    "errorNoSupabase": "Supabase não configurado. Configure as variáveis de ambiente."
+  },
+  "setup": {
+    "title": "Bem-vindo ao Arcus CRM",
+    "subtitle": "Vamos preparar seu ambiente de trabalho.",
+    "checking": "Verificando configuração…",
+    "companyName": "Nome da Empresa",
+    "adminEmail": "Email do Administrador",
+    "password": "Senha",
+    "confirmPassword": "Confirmar Senha",
+    "submit": "Começar Agora",
+    "requirements": "Requisitos:",
+    "reqMinLength": "Mínimo 6 caracteres",
+    "reqLowercase": "Letra minúscula",
+    "reqUppercase": "Letra maiúscula",
+    "reqDigit": "Número",
+    "passwordsNoMatch": "As senhas não coincidem",
+    "passwordsMatch": "✓ Senhas coincidem",
+    "errorPasswordReqs": "A senha não atende aos requisitos mínimos",
+    "errorPasswordsNoMatch": "As senhas não coincidem",
+    "copyright": "Arcus CRM. Todos os direitos reservados."
+  },
+  "nav": {
+    "inbox": "Inbox",
+    "dashboard": "Visão Geral",
+    "boards": "Boards",
+    "contacts": "Contatos",
+    "activities": "Atividades",
+    "reports": "Relatórios",
+    "settings": "Configurações",
+    "collapseMenu": "Recolher Menu",
+    "expandMenu": "Expandir Menu",
+    "editProfile": "Editar Perfil",
+    "signOut": "Sair da conta"
+  },
+  "pwa": {
+    "install": "Instale o Arcus CRM"
+  },
+  "consent": {
+    "title": "Consentimentos Necessários",
+    "subtitle": "Para continuar usando o Arcus CRM, precisamos do seu consentimento.",
+    "terms_title": "Termos de Uso",
+    "terms_desc": "Li e aceito os Termos de Uso do Arcus CRM.",
+    "privacy_title": "Política de Privacidade",
+    "privacy_desc": "Li e aceito a Política de Privacidade, que explica como seus dados são coletados e utilizados.",
+    "data_processing_title": "Processamento de Dados",
+    "data_processing_desc": "Autorizo o processamento dos meus dados pessoais para uso da plataforma, conforme a LGPD.",
+    "marketing_title": "Comunicações de Marketing",
+    "marketing_desc": "Aceito receber comunicações promocionais e novidades por email.",
+    "analytics_title": "Análise de Uso",
+    "analytics_desc": "Autorizo a coleta de dados de uso para melhoria da plataforma.",
+    "required": "obrigatório",
+    "optional": "opcional",
+    "acceptAll": "Aceitar Tudo",
+    "acceptSelected": "Aceitar Selecionados"
+  },
+  "language": {
+    "toggle": "EN",
+    "current": "PT"
+  }
+}
