@@ -71,7 +71,7 @@ export const generateReportPDF = async (data: ReportData, period: PeriodFilter, 
     // HEADER
     // ============================================
 
-    // Logo placeholder (N for NossoCRM)
+    // Logo placeholder (N for Arcus CRM)
     doc.setFillColor(...COLORS.blue);
     doc.roundedRect(margin, 12, 12, 12, 2, 2, 'F');
     doc.setFontSize(10);
@@ -317,7 +317,7 @@ export const generateReportPDF = async (data: ReportData, period: PeriodFilter, 
     // Footer text
     doc.setFontSize(7);
     doc.setTextColor(...COLORS.secondary);
-    doc.text('NossoCRM', margin, pageHeight - 10);
+    doc.text('Arcus CRM', margin, pageHeight - 10);
     doc.text('Página 1', pageWidth / 2, pageHeight - 10, { align: 'center' });
     doc.text(new Date().toLocaleDateString('pt-BR'), pageWidth - margin, pageHeight - 10, { align: 'right' });
 

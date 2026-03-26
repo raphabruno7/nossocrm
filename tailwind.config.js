@@ -15,7 +15,7 @@ const config = {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['var(--font-inter)', 'Inter', 'sans-serif'],
+                sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
                 display: ['Space Grotesk', 'sans-serif'],
                 serif: ['Cinzel', 'serif'],
             },

@@ -8,7 +8,7 @@ import { loadEnvFile } from './helpers/env';
 // Ensure env is loaded before we decide whether to skip (Vitest may evaluate
 // the test module before running setupFiles).
 // NOTE: don't use import.meta.url here; Vitest may bundle tests into .vite-temp.
-// When running with vitest config root=crmia-next, cwd should be crmia-next/.
+// When running with vitest config root=arcus-crm, cwd should be arcus-crm/.
 const nextRoot = process.cwd();
 const repoRoot = `${nextRoot}/..`;
 

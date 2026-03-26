@@ -58,7 +58,7 @@ process.stderr.write = ((chunk: any, ...rest: any[]) => {
   return originalStderrWrite(chunk, ...rest);
 }) as any;
 
-// Prefer envs from THIS project folder so crmia-next can be moved to its own repo.
+// Prefer envs from THIS project folder so arcus-crm can be moved to its own repo.
 // (When running inside the monorepo, we keep the old root .env as a fallback.)
 loadEnvFile(new URL('../.env', import.meta.url).pathname);
 loadEnvFile(new URL('../.env.local', import.meta.url).pathname, { override: true });
