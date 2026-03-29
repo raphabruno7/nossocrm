@@ -242,7 +242,7 @@ export const DataStorageSettings: React.FC = () => {
 
                             <div className="space-y-3">
                                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                                    {t('confirmLabel', { code: <span className="font-mono bg-red-100 dark:bg-red-900/30 px-1 rounded">{t('confirmCode')}</span> })}
+                                    {t('confirmLabelPrefix')} <span className="font-mono bg-red-100 dark:bg-red-900/30 px-1 rounded">{t('confirmCode')}</span> {t('confirmLabelSuffix')}
                                 </label>
                                 <input
                                     type="text"
