@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { useLocale, useTranslations } from 'next-intl';
 import { Phone, Users, Mail, CheckSquare, Clock, Trash2, Edit2, CheckCircle2, Circle, Building2 } from 'lucide-react';
 import { useCRM } from '@/context/CRMContext';
 import { Activity, Deal, Contact, Company } from '@/types';
@@ -31,6 +32,8 @@ const ActivityRowComponent: React.FC<ActivityRowProps> = ({
     isSelected = false,
     onSelect
 }) => {
+    const t = useTranslations('activities.row');
+    const locale = useLocale();
     const getActivityIcon = (type: Activity['type']) => {
         switch (type) {
             case 'CALL': return <Phone size={16} className="text-blue-500" />;
@@ -42,7 +45,7 @@ const ActivityRowComponent: React.FC<ActivityRowProps> = ({
         }
     };
 
-    const { activeBoard, boards } = useCRM();
+    const { boards } = useCRM();
 
     const translateStatus = (status: string) => {
         // Se não parece ser um UUID, retorna direto (já é um label legível)
@@ -59,20 +62,20 @@ const ActivityRowComponent: React.FC<ActivityRowProps> = ({
 
         // Fallback para mapeamento legado
         const map: Record<string, string> = {
-            'NEW': 'Novas Oportunidades',
-            'CONTACTED': 'Contatado',
-            'PROPOSAL': 'Proposta',
-            'NEGOTIATION': 'Negociação',
-            'CLOSED_WON': 'Ganho',
-            'CLOSED_LOST': 'Perdido',
-            'LEAD': 'Lead',
-            'MQL': 'Lead Qualificado',
-            'PROSPECT': 'Oportunidade',
-            'CUSTOMER': 'Cliente'
+            'NEW': t('legacyStatuses.new'),
+            'CONTACTED': t('legacyStatuses.contacted'),
+            'PROPOSAL': t('legacyStatuses.proposal'),
+            'NEGOTIATION': t('legacyStatuses.negotiation'),
+            'CLOSED_WON': t('legacyStatuses.closedWon'),
+            'CLOSED_LOST': t('legacyStatuses.closedLost'),
+            'LEAD': t('legacyStatuses.lead'),
+            'MQL': t('legacyStatuses.mql'),
+            'PROSPECT': t('legacyStatuses.prospect'),
+            'CUSTOMER': t('legacyStatuses.customer')
         };
         
         // Se ainda é UUID e não encontrou, mostra fallback amigável
-        return map[status] || 'Estágio não identificado';
+        return map[status] || t('stageNotIdentified');
     };
 
     const formatRelativeTime = (dateString: string) => {
@@ -80,11 +83,11 @@ const ActivityRowComponent: React.FC<ActivityRowProps> = ({
         const now = new Date();
         const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-        if (diffInSeconds < 60) return 'agora mesmo';
-        if (diffInSeconds < 3600) return `há ${Math.floor(diffInSeconds / 60)} min`;
-        if (diffInSeconds < 86400) return `há ${Math.floor(diffInSeconds / 3600)} h`;
-        if (diffInSeconds < 172800) return 'ontem';
-        return date.toLocaleDateString('pt-BR');
+        if (diffInSeconds < 60) return t('justNow');
+        if (diffInSeconds < 3600) return t('minutesAgo', { count: Math.floor(diffInSeconds / 60) });
+        if (diffInSeconds < 86400) return t('hoursAgo', { count: Math.floor(diffInSeconds / 3600) });
+        if (diffInSeconds < 172800) return t('yesterday');
+        return date.toLocaleDateString(locale);
     };
 
     const formatTitle = (title: string) => {
@@ -92,11 +95,12 @@ const ActivityRowComponent: React.FC<ActivityRowProps> = ({
             const status = title.replace('Moveu para ', '');
             return (
                 <span>
-                    Movido para <span className="font-bold text-slate-700 dark:text-slate-200">{translateStatus(status)}</span>
+                    {t('movedTo')}{' '}
+                    <span className="font-bold text-slate-700 dark:text-slate-200">{translateStatus(status)}</span>
                 </span>
             );
         }
-        if (title === 'Negócio Criado') return 'Negócio criado';
+        if (title === 'Negócio Criado') return t('dealCreated');
         return title;
     };
 
@@ -157,7 +161,7 @@ const ActivityRowComponent: React.FC<ActivityRowProps> = ({
                     </h3>
                     {isOverdue && (
                         <span className="text-[10px] font-bold px-2 py-0.5 bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400 rounded-full">
-                            ATRASADO
+                            {t('overdue')}
                         </span>
                     )}
                 </div>
@@ -172,7 +176,7 @@ const ActivityRowComponent: React.FC<ActivityRowProps> = ({
                         <Link
                             href={`/contacts?contactId=${contact.id}`}
                             className="flex items-center gap-1.5 text-primary-600 dark:text-primary-400 font-medium hover:underline"
-                            title={`Abrir contato: ${contact.name}`}
+                            title={t('openContact', { name: contact.name })}
                         >
                             <Users size={14} />
                             <span className="truncate max-w-[280px]">{contact.name}</span>
@@ -195,14 +199,14 @@ const ActivityRowComponent: React.FC<ActivityRowProps> = ({
                 <button
                     onClick={() => onEdit(activity)}
                     className="p-2 text-slate-400 hover:text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-500/10 rounded-lg transition-colors"
-                    title="Editar"
+                    title={t('edit')}
                 >
                     <Edit2 size={16} />
                 </button>
                 <button
                     onClick={() => onDelete(activity.id)}
                     className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
-                    title="Excluir"
+                    title={t('delete')}
                 >
                     <Trash2 size={16} />
                 </button>

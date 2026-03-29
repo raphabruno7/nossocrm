@@ -1,6 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslations } from 'next-intl';
 import { Activity, Deal } from '@/types';
 import { Modal, ModalForm } from '@/components/ui/Modal';
 import {
@@ -21,13 +22,6 @@ interface ActivityFormModalV2Props {
   editingActivity: Activity | null;
   deals: Deal[];
 }
-
-const activityTypeOptions = [
-  { value: 'CALL', label: 'Ligação' },
-  { value: 'MEETING', label: 'Reunião' },
-  { value: 'EMAIL', label: 'Email' },
-  { value: 'TASK', label: 'Tarefa' },
-];
 
 // Helper to get safe activity type for form
 const getSafeActivityType = (type?: Activity['type']): FormActivityType => {
@@ -63,8 +57,15 @@ export const ActivityFormModalV2: React.FC<ActivityFormModalV2Props> = ({
   editingActivity,
   deals,
 }) => {
+  const t = useTranslations('activities.form');
   const defaultDate = new Date().toISOString().split('T')[0];
   const defaultTime = new Date().toTimeString().slice(0, 5);
+  const activityTypeOptions = [
+    { value: 'CALL', label: t('types.call') },
+    { value: 'MEETING', label: t('types.meeting') },
+    { value: 'EMAIL', label: t('types.email') },
+    { value: 'TASK', label: t('types.task') },
+  ];
 
   const form = useForm<ActivityFormData>({
     resolver: zodResolver(activityFormSchema) as any,
@@ -114,27 +115,27 @@ export const ActivityFormModalV2: React.FC<ActivityFormModalV2Props> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={editingActivity ? 'Editar Atividade' : 'Nova Atividade'}
+      title={editingActivity ? t('editTitle') : t('createTitle')}
     >
       <ModalForm onSubmit={handleSubmit(handleFormSubmit)}>
         <InputField
-          label="Título"
-          placeholder="Ex: Ligar para Cliente"
+          label={t('titleLabel')}
+          placeholder={t('titlePlaceholder')}
           error={errors.title}
           registration={register('title')}
         />
 
         <div className="grid grid-cols-2 gap-4">
           <SelectField
-            label="Tipo"
+            label={t('typeLabel')}
             options={activityTypeOptions}
             error={errors.type}
             registration={register('type')}
           />
           <SelectField
-            label="Negócio Relacionado"
+            label={t('dealLabel')}
             options={dealOptions}
-            placeholder="Selecione..."
+            placeholder={t('selectPlaceholder')}
             error={errors.dealId}
             registration={register('dealId')}
           />
@@ -142,13 +143,13 @@ export const ActivityFormModalV2: React.FC<ActivityFormModalV2Props> = ({
 
         <div className="grid grid-cols-2 gap-4">
           <InputField
-            label="Data"
+            label={t('dateLabel')}
             type="date"
             error={errors.date}
             registration={register('date')}
           />
           <InputField
-            label="Hora"
+            label={t('timeLabel')}
             type="time"
             error={errors.time}
             registration={register('time')}
@@ -156,14 +157,14 @@ export const ActivityFormModalV2: React.FC<ActivityFormModalV2Props> = ({
         </div>
 
         <TextareaField
-          label="Descrição"
-          placeholder="Detalhes da atividade..."
+          label={t('descriptionLabel')}
+          placeholder={t('descriptionPlaceholder')}
           error={errors.description}
           registration={register('description')}
         />
 
         <SubmitButton isLoading={isSubmitting}>
-          {editingActivity ? 'Salvar Alterações' : 'Criar Atividade'}
+          {editingActivity ? t('save') : t('create')}
         </SubmitButton>
       </ModalForm>
     </Modal>

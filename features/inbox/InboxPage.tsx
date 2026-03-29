@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useInboxController } from './hooks/useInboxController';
 import { ViewModeToggle } from './components/ViewModeToggle';
 import { InboxOverviewView } from './components/InboxOverviewView';
@@ -13,6 +14,7 @@ import { DebugFillButton } from '@/components/debug/DebugFillButton';
  */
 export const InboxPage: React.FC = () => {
   const router = useRouter();
+  const t = useTranslations('inbox.page');
 
   // Controla “intenção” ao abrir a Lista (ex.: abrir já com sugestões expandidas)
   const [listPreset, setListPreset] = useState<'default' | 'suggestions-expanded'>('default');
@@ -70,9 +72,9 @@ export const InboxPage: React.FC = () => {
           <h1 className="text-3xl font-bold font-display text-slate-900 dark:text-white mb-1">
             Inbox
           </h1>
-          <p className="text-slate-500 dark:text-slate-400">Sua mesa de trabalho.</p>
+          <p className="text-slate-500 dark:text-slate-400">{t('subtitle')}</p>
           <div className="mt-4 flex gap-2">
-            <DebugFillButton onClick={seedInboxDebug} label="Seed Inbox" variant="secondary" />
+            <DebugFillButton onClick={seedInboxDebug} label={t('seedButton')} variant="secondary" />
           </div>
         </div>
 

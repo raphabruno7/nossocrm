@@ -1,8 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { NextIntlClientProvider } from 'next-intl';
 import ConfirmModal from './ConfirmModal';
 import { axe } from '@/lib/a11y/test/a11y-utils';
+import ptMessages from '@/messages/pt.json';
 
 // Mock focus-trap-react
 vi.mock('focus-trap-react', () => ({
@@ -12,6 +14,14 @@ vi.mock('focus-trap-react', () => ({
     </div>
   ),
 }));
+
+function renderWithIntl(ui: React.ReactNode) {
+  return render(
+    <NextIntlClientProvider locale="pt" messages={ptMessages}>
+      {ui}
+    </NextIntlClientProvider>
+  );
+}
 
 describe('ConfirmModal', () => {
   const defaultProps = {
@@ -28,17 +38,17 @@ describe('ConfirmModal', () => {
 
   describe('Accessibility', () => {
     it('should have role="alertdialog"', () => {
-      render(<ConfirmModal {...defaultProps} />);
+      renderWithIntl(<ConfirmModal {...defaultProps} />);
       expect(screen.getByRole('alertdialog')).toBeInTheDocument();
     });
 
     it('should have aria-modal="true"', () => {
-      render(<ConfirmModal {...defaultProps} />);
+      renderWithIntl(<ConfirmModal {...defaultProps} />);
       expect(screen.getByRole('alertdialog')).toHaveAttribute('aria-modal', 'true');
     });
 
     it('should have aria-labelledby pointing to title', () => {
-      render(<ConfirmModal {...defaultProps} />);
+      renderWithIntl(<ConfirmModal {...defaultProps} />);
       const dialog = screen.getByRole('alertdialog');
       const labelledBy = dialog.getAttribute('aria-labelledby');
       expect(labelledBy).toBeTruthy();
@@ -48,7 +58,7 @@ describe('ConfirmModal', () => {
     });
 
     it('should have aria-describedby pointing to message', () => {
-      render(<ConfirmModal {...defaultProps} />);
+      renderWithIntl(<ConfirmModal {...defaultProps} />);
       const dialog = screen.getByRole('alertdialog');
       const describedBy = dialog.getAttribute('aria-describedby');
       expect(describedBy).toBeTruthy();
@@ -58,13 +68,13 @@ describe('ConfirmModal', () => {
     });
 
     it('should have accessible buttons', () => {
-      render(<ConfirmModal {...defaultProps} />);
+      renderWithIntl(<ConfirmModal {...defaultProps} />);
       expect(screen.getByRole('button', { name: /cancelar/i })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /confirmar/i })).toBeInTheDocument();
     });
 
     it('should position cancel button as the safest default option', () => {
-      render(<ConfirmModal {...defaultProps} />);
+      renderWithIntl(<ConfirmModal {...defaultProps} />);
       // Cancel button should exist and be accessible
       const cancelButton = screen.getByRole('button', { name: /cancelar/i });
       expect(cancelButton).toBeInTheDocument();
@@ -74,7 +84,7 @@ describe('ConfirmModal', () => {
     });
 
     it('should pass axe accessibility tests', async () => {
-      const { container } = render(<ConfirmModal {...defaultProps} />);
+      const { container } = renderWithIntl(<ConfirmModal {...defaultProps} />);
       const results = await axe(container);
       expect(results.violations).toHaveLength(0);
     });
@@ -82,12 +92,12 @@ describe('ConfirmModal', () => {
 
   describe('Focus Management', () => {
     it('should render FocusTrap when open', () => {
-      render(<ConfirmModal {...defaultProps} />);
+      renderWithIntl(<ConfirmModal {...defaultProps} />);
       expect(screen.getByTestId('focus-trap')).toHaveAttribute('data-active', 'true');
     });
 
     it('should not render when closed', () => {
-      render(<ConfirmModal {...defaultProps} isOpen={false} />);
+      renderWithIntl(<ConfirmModal {...defaultProps} isOpen={false} />);
       expect(screen.queryByTestId('focus-trap')).not.toBeInTheDocument();
     });
   });
@@ -95,7 +105,7 @@ describe('ConfirmModal', () => {
   describe('User Interactions', () => {
     it('should call onClose when cancel is clicked', async () => {
       const onClose = vi.fn();
-      render(<ConfirmModal {...defaultProps} onClose={onClose} />);
+      renderWithIntl(<ConfirmModal {...defaultProps} onClose={onClose} />);
       
       await userEvent.click(screen.getByRole('button', { name: /cancelar/i }));
       expect(onClose).toHaveBeenCalledTimes(1);
@@ -104,7 +114,7 @@ describe('ConfirmModal', () => {
     it('should call onConfirm and onClose when confirm is clicked', async () => {
       const onClose = vi.fn();
       const onConfirm = vi.fn();
-      render(<ConfirmModal {...defaultProps} onClose={onClose} onConfirm={onConfirm} />);
+      renderWithIntl(<ConfirmModal {...defaultProps} onClose={onClose} onConfirm={onConfirm} />);
       
       await userEvent.click(screen.getByRole('button', { name: /confirmar/i }));
       expect(onConfirm).toHaveBeenCalledTimes(1);
@@ -113,7 +123,7 @@ describe('ConfirmModal', () => {
 
     it('should call onClose when backdrop is clicked', async () => {
       const onClose = vi.fn();
-      const { container } = render(<ConfirmModal {...defaultProps} onClose={onClose} />);
+      const { container } = renderWithIntl(<ConfirmModal {...defaultProps} onClose={onClose} />);
       
       const backdrop = container.querySelector('.fixed.inset-0');
       if (backdrop) {
@@ -125,25 +135,25 @@ describe('ConfirmModal', () => {
 
   describe('Custom Text', () => {
     it('should render custom confirm text', () => {
-      render(<ConfirmModal {...defaultProps} confirmText="Delete" />);
+      renderWithIntl(<ConfirmModal {...defaultProps} confirmText="Delete" />);
       expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
     });
 
     it('should render custom cancel text', () => {
-      render(<ConfirmModal {...defaultProps} cancelText="Go Back" />);
+      renderWithIntl(<ConfirmModal {...defaultProps} cancelText="Go Back" />);
       expect(screen.getByRole('button', { name: /go back/i })).toBeInTheDocument();
     });
   });
 
   describe('Variants', () => {
     it('should apply danger variant styles', () => {
-      render(<ConfirmModal {...defaultProps} variant="danger" />);
+      renderWithIntl(<ConfirmModal {...defaultProps} variant="danger" />);
       const confirmButton = screen.getByRole('button', { name: /confirmar/i });
       expect(confirmButton).toHaveClass('bg-red-600');
     });
 
     it('should apply primary variant styles', () => {
-      render(<ConfirmModal {...defaultProps} variant="primary" />);
+      renderWithIntl(<ConfirmModal {...defaultProps} variant="primary" />);
       const confirmButton = screen.getByRole('button', { name: /confirmar/i });
       expect(confirmButton).toHaveClass('bg-primary-600');
     });

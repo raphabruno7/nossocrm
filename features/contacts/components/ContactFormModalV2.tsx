@@ -2,6 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useTranslations } from 'next-intl';
 import { Contact } from '@/types';
 import { Modal, ModalForm } from '@/components/ui/Modal';
 import { InputField, SubmitButton } from '@/components/ui/FormField';
@@ -43,6 +44,7 @@ export const ContactFormModalV2: React.FC<ContactFormModalProps> = ({
   editingContact,
   defaultCompanyName = '',
 }) => {
+  const t = useTranslations('contacts.contactForm');
   const form = useForm<ContactFormInput>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {
@@ -85,54 +87,54 @@ export const ContactFormModalV2: React.FC<ContactFormModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={editingContact ? 'Editar Contato' : 'Novo Contato'}
+      title={editingContact ? t('editTitle') : t('createTitle')}
     >
       <ModalForm onSubmit={handleSubmit(handleFormSubmit)}>
         <InputField
-          label="Nome Completo"
-          placeholder="Ex: Ana Souza"
+          label={t('fullName')}
+          placeholder={t('fullNamePlaceholder')}
           error={errors.name}
           registration={register('name')}
         />
 
         <InputField
-          label="Email"
+          label={t('email')}
           type="email"
-          placeholder="ana@empresa.com"
+          placeholder={t('emailPlaceholder')}
           error={errors.email}
           registration={register('email')}
         />
 
         <div className="grid grid-cols-2 gap-4">
           <InputField
-            label="Telefone"
-            placeholder="+5511999999999"
-            hint="Formato E.164 (ex.: +5511999999999)"
+            label={t('phone')}
+            placeholder={t('phonePlaceholder')}
+            hint={t('phoneHint')}
             error={errors.phone}
             registration={register('phone')}
           />
           <InputField
-            label="Cargo"
-            placeholder="Gerente"
+            label={t('role')}
+            placeholder={t('rolePlaceholder')}
             error={errors.role}
             registration={register('role')}
           />
         </div>
 
         <InputField
-          label="Empresa"
-          placeholder="Nome da Empresa"
+          label={t('company')}
+          placeholder={t('companyPlaceholder')}
           hint={
             editingContact
-              ? 'Edite para alterar a empresa. Deixe em branco para desvincular.'
-              : 'Se a empresa já existir, o contato será vinculado a ela.'
+              ? t('companyHintEdit')
+              : t('companyHintCreate')
           }
           error={errors.companyName}
           registration={register('companyName')}
         />
 
         <SubmitButton isLoading={isSubmitting}>
-          {editingContact ? 'Salvar Alterações' : 'Criar Contato'}
+          {editingContact ? t('save') : t('create')}
         </SubmitButton>
       </ModalForm>
     </Modal>

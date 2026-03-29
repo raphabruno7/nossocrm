@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { X } from 'lucide-react';
 import { Activity, Deal } from '@/types';
 
@@ -52,6 +53,13 @@ export const ActivityFormModal: React.FC<ActivityFormModalProps> = ({
   editingActivity,
   deals,
 }) => {
+  const t = useTranslations('activities.form');
+  const titleId = React.useId();
+  const typeId = React.useId();
+  const dealId = React.useId();
+  const dateId = React.useId();
+  const timeId = React.useId();
+  const descriptionId = React.useId();
   React.useEffect(() => {
     if (!isOpen) return;
     const handleEscape = (event: KeyboardEvent) => {
@@ -78,10 +86,11 @@ export const ActivityFormModal: React.FC<ActivityFormModalProps> = ({
       >
         <div className="p-5 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
           <h2 className="text-lg font-bold text-slate-900 dark:text-white font-display">
-            {editingActivity ? 'Editar Atividade' : 'Nova Atividade'}
+            {editingActivity ? t('editTitle') : t('createTitle')}
           </h2>
           <button
             onClick={onClose}
+            aria-label={t('closeAriaLabel')}
             className="text-slate-400 hover:text-slate-600 dark:hover:text-white"
           >
             <X size={20} />
@@ -89,12 +98,13 @@ export const ActivityFormModal: React.FC<ActivityFormModalProps> = ({
         </div>
         <form onSubmit={onSubmit} className="p-5 space-y-4 overflow-auto pb-[calc(1.25rem+var(--app-safe-area-bottom,0px))]">
           <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Título</label>
+            <label htmlFor={titleId} className="block text-xs font-bold text-slate-500 uppercase mb-1">{t('titleLabel')}</label>
             <input
+              id={titleId}
               required
               type="text"
               className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500"
-              placeholder="Ex: Ligar para Cliente"
+              placeholder={t('titlePlaceholder')}
               value={formData.title}
               onChange={e => setFormData({ ...formData, title: e.target.value })}
             />
@@ -102,31 +112,33 @@ export const ActivityFormModal: React.FC<ActivityFormModalProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Tipo</label>
+              <label htmlFor={typeId} className="block text-xs font-bold text-slate-500 uppercase mb-1">{t('typeLabel')}</label>
               <select
+                id={typeId}
                 className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500"
                 value={formData.type}
                 onChange={e =>
                   setFormData({ ...formData, type: e.target.value as Activity['type'] })
                 }
               >
-                <option value="CALL">Ligação</option>
-                <option value="MEETING">Reunião</option>
-                <option value="EMAIL">Email</option>
-                <option value="TASK">Tarefa</option>
+                <option value="CALL">{t('types.call')}</option>
+                <option value="MEETING">{t('types.meeting')}</option>
+                <option value="EMAIL">{t('types.email')}</option>
+                <option value="TASK">{t('types.task')}</option>
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-                Negócio Relacionado
+              <label htmlFor={dealId} className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                {t('dealLabel')}
               </label>
               <select
+                id={dealId}
                 required={!editingActivity}
                 className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500"
                 value={formData.dealId}
                 onChange={e => setFormData({ ...formData, dealId: e.target.value })}
               >
-                <option value="">Selecione...</option>
+                <option value="">{t('selectPlaceholder')}</option>
                 {deals.map(deal => (
                   <option key={deal.id} value={deal.id}>
                     {deal.title}
@@ -138,8 +150,9 @@ export const ActivityFormModal: React.FC<ActivityFormModalProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Data</label>
+              <label htmlFor={dateId} className="block text-xs font-bold text-slate-500 uppercase mb-1">{t('dateLabel')}</label>
               <input
+                id={dateId}
                 required
                 type="date"
                 className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500"
@@ -148,8 +161,9 @@ export const ActivityFormModal: React.FC<ActivityFormModalProps> = ({
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Hora</label>
+              <label htmlFor={timeId} className="block text-xs font-bold text-slate-500 uppercase mb-1">{t('timeLabel')}</label>
               <input
+                id={timeId}
                 required
                 type="time"
                 className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500"
@@ -160,12 +174,13 @@ export const ActivityFormModal: React.FC<ActivityFormModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-              Descrição
+            <label htmlFor={descriptionId} className="block text-xs font-bold text-slate-500 uppercase mb-1">
+              {t('descriptionLabel')}
             </label>
             <textarea
+              id={descriptionId}
               className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500 min-h-[80px]"
-              placeholder="Detalhes da atividade..."
+              placeholder={t('descriptionPlaceholder')}
               value={formData.description}
               onChange={e => setFormData({ ...formData, description: e.target.value })}
             />
@@ -175,7 +190,7 @@ export const ActivityFormModal: React.FC<ActivityFormModalProps> = ({
             type="submit"
             className="w-full bg-primary-600 hover:bg-primary-500 text-white font-bold py-2.5 rounded-lg mt-2 shadow-lg shadow-primary-600/20 transition-all"
           >
-            {editingActivity ? 'Salvar Alterações' : 'Criar Atividade'}
+            {editingActivity ? t('save') : t('create')}
           </button>
         </form>
       </div>

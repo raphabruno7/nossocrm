@@ -1,4 +1,3 @@
-import { PeriodFilter, PERIOD_LABELS } from '@/features/dashboard/hooks/useDashboardMetrics';
 import type { CurrencyCode, Deal } from '@/types';
 import { formatCurrency as formatMoneyFull, formatCurrencyCompact as formatMoneyCompact } from '@/lib/currency';
 
@@ -16,6 +15,36 @@ interface ReportData {
     };
     funnelData: { name: string; count: number }[];
     currencyCode?: CurrencyCode;
+}
+
+interface ReportPDFLabels {
+    title: string;
+    pipelinePrefix: string;
+    defaultBoardName: string;
+    generatedByPrefix: string;
+    timeConnector: string;
+    fallbackUser: string;
+    kpis: {
+        pipelineTotal: string;
+        winRate: string;
+        avgCycle: string;
+        closedVolume: string;
+        min: string;
+        days: string;
+        deals: string;
+    };
+    funnelTitle: string;
+    leaderboardTitle: string;
+    noOwner: string;
+    noDataInPeriod: string;
+    tableHeaders: {
+        rank: string;
+        seller: string;
+        deals: string;
+        revenue: string;
+    };
+    footerAppName: string;
+    footerPage: string;
 }
 
 // Color Palette
@@ -39,12 +68,20 @@ const COLORS = {
  * reduzindo o bundle inicial em ~200KB.
  *
  * @param {ReportData} data - Dados do relatório (pipeline, win rate, deals, etc.)
- * @param {PeriodFilter} period - Período selecionado para o relatório
+ * @param {string} periodLabel - Label do período selecionado para o relatório
+ * @param {ReportPDFLabels} labels - Labels traduzidos do PDF
  * @param {string | undefined} boardName - Nome do pipeline/board
  * @param {string | undefined} generatedBy - Nome do usuário que gerou o relatório
  * @returns {Promise<void>} Promise que resolve quando o PDF é gerado e aberto
  */
-export const generateReportPDF = async (data: ReportData, period: PeriodFilter, boardName?: string, generatedBy?: string) => {
+export const generateReportPDF = async (
+    data: ReportData,
+    periodLabel: string,
+    labels: ReportPDFLabels,
+    boardName?: string,
+    generatedBy?: string,
+    locale = 'en-US'
+) => {
     // Dynamic imports - carrega jsPDF apenas quando a função é chamada
     // Isso remove ~200KB do bundle inicial
     const [{ jsPDF }, autoTableModule] = await Promise.all([
@@ -64,8 +101,8 @@ export const generateReportPDF = async (data: ReportData, period: PeriodFilter, 
 
     // Current date/time
     const now = new Date();
-    const dateStr = now.toLocaleDateString('pt-BR');
-    const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const dateStr = now.toLocaleDateString(locale);
+    const timeStr = now.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
 
     // ============================================
     // HEADER
@@ -83,16 +120,15 @@ export const generateReportPDF = async (data: ReportData, period: PeriodFilter, 
     doc.setFontSize(20);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...COLORS.primary);
-    doc.text('Relatório de Performance', margin + 18, 21);
+    doc.text(labels.title, margin + 18, 21);
 
     // Pipeline name
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...COLORS.secondary);
-    doc.text(`Pipeline: ${boardName || 'Padrão'}`, margin, 32);
+    doc.text(`${labels.pipelinePrefix}: ${boardName || labels.defaultBoardName}`, margin, 32);
 
     // Period badge - Rocket science precision
-    const periodLabel = PERIOD_LABELS[period];
     const fontSize = 8;
     const paddingX = 8;
     const paddingY = 3;
@@ -121,7 +157,7 @@ export const generateReportPDF = async (data: ReportData, period: PeriodFilter, 
     doc.setFontSize(7);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...COLORS.secondary);
-    doc.text(`Por: ${generatedBy || 'Usuário'} | ${dateStr} às ${timeStr}`, pageWidth - margin, metaY, { align: 'right' });
+    doc.text(`${labels.generatedByPrefix}: ${generatedBy || labels.fallbackUser} | ${dateStr} ${labels.timeConnector} ${timeStr}`, pageWidth - margin, metaY, { align: 'right' });
 
     // Divider
     doc.setDrawColor(...COLORS.border);
@@ -138,30 +174,30 @@ export const generateReportPDF = async (data: ReportData, period: PeriodFilter, 
 
     const kpis = [
         {
-            label: 'Pipeline Total',
+            label: labels.kpis.pipelineTotal,
             value: formatCurrency(data.pipelineValue),
             change: `${data.changes.pipeline >= 0 ? '+' : ''}${data.changes.pipeline.toFixed(1)}%`,
             isPositive: data.changes.pipeline >= 0,
             accent: COLORS.blue
         },
         {
-            label: 'Win Rate',
+            label: labels.kpis.winRate,
             value: `${data.actualWinRate.toFixed(1)}%`,
             change: `${data.changes.winRate >= 0 ? '+' : ''}${data.changes.winRate.toFixed(1)}%`,
             isPositive: data.changes.winRate >= 0,
             accent: COLORS.emerald
         },
         {
-            label: 'Ciclo Médio',
-            value: `${data.avgSalesCycle} dias`,
-            change: `Mín: ${data.fastestDeal}d`,
+            label: labels.kpis.avgCycle,
+            value: `${data.avgSalesCycle} ${labels.kpis.days}`,
+            change: `${labels.kpis.min}: ${data.fastestDeal}d`,
             isPositive: true,
             accent: COLORS.purple
         },
         {
-            label: 'Volume Fechado',
+            label: labels.kpis.closedVolume,
             value: formatCurrency(data.wonRevenue),
-            change: `${data.wonDeals.length} deals`,
+            change: `${data.wonDeals.length} ${labels.kpis.deals}`,
             isPositive: true,
             accent: COLORS.orange
         },
@@ -208,7 +244,7 @@ export const generateReportPDF = async (data: ReportData, period: PeriodFilter, 
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...COLORS.primary);
-    doc.text('Funil de Vendas', margin, funnelY);
+    doc.text(labels.funnelTitle, margin, funnelY);
 
     const maxCount = Math.max(...data.funnelData.map(s => s.count), 1);
     const barMaxWidth = contentWidth - 80; // Space for label and count
@@ -251,12 +287,12 @@ export const generateReportPDF = async (data: ReportData, period: PeriodFilter, 
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...COLORS.primary);
-    doc.text('Top Vendedores', margin, leaderboardY);
+    doc.text(labels.leaderboardTitle, margin, leaderboardY);
 
     // Prepare data
     const repsMap: Record<string, { name: string; deals: number; revenue: number }> = {};
     data.wonDeals.forEach((deal) => {
-        const ownerName = deal.owner?.name || 'Sem Dono';
+        const ownerName = deal.owner?.name || labels.noOwner;
         if (!repsMap[ownerName]) {
             repsMap[ownerName] = { name: ownerName, deals: 0, revenue: 0 };
         }
@@ -275,11 +311,11 @@ export const generateReportPDF = async (data: ReportData, period: PeriodFilter, 
             rep.deals.toString(),
             formatMoneyFull(rep.revenue, currencyCode)
         ])
-        : [['—', 'Sem dados no período', '—', '—']];
+        : [['—', labels.noDataInPeriod, '—', '—']];
 
     autoTable(doc, {
         startY: leaderboardY + 5,
-        head: [['#', 'Vendedor', 'Deals', 'Receita']],
+        head: [[labels.tableHeaders.rank, labels.tableHeaders.seller, labels.tableHeaders.deals, labels.tableHeaders.revenue]],
         body: tableData,
         theme: 'striped',
         tableWidth: contentWidth,
@@ -317,9 +353,9 @@ export const generateReportPDF = async (data: ReportData, period: PeriodFilter, 
     // Footer text
     doc.setFontSize(7);
     doc.setTextColor(...COLORS.secondary);
-    doc.text('Arcus CRM', margin, pageHeight - 10);
-    doc.text('Página 1', pageWidth / 2, pageHeight - 10, { align: 'center' });
-    doc.text(new Date().toLocaleDateString('pt-BR'), pageWidth - margin, pageHeight - 10, { align: 'right' });
+    doc.text(labels.footerAppName, margin, pageHeight - 10);
+    doc.text(`${labels.footerPage} 1`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+    doc.text(new Date().toLocaleDateString(locale), pageWidth - margin, pageHeight - 10, { align: 'right' });
 
     // ============================================
     // OUTPUT

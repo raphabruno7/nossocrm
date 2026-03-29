@@ -3,6 +3,7 @@ import { X, Plus, Trash2, ArrowUp, ArrowDown, Check } from 'lucide-react';
 import { useCRM } from '@/context/CRMContext';
 import { LifecycleStage } from '@/types';
 import { FocusTrap, useFocusReturn } from '@/lib/a11y';
+import { useTranslations } from 'next-intl';
 
 interface LifecycleSettingsModalProps {
     isOpen: boolean;
@@ -35,6 +36,7 @@ export const LifecycleSettingsModal: React.FC<LifecycleSettingsModalProps> = ({ 
     const { lifecycleStages, addLifecycleStage, updateLifecycleStage, deleteLifecycleStage, reorderLifecycleStages, contacts } = useCRM();
     const [newStageName, setNewStageName] = useState('');
     const [isAdding, setIsAdding] = useState(false);
+    const t = useTranslations('settings.lifecycle');
 
     // Calcular contagem de contatos por estágio
     const stageCounts = React.useMemo(() => {
@@ -82,10 +84,10 @@ export const LifecycleSettingsModal: React.FC<LifecycleSettingsModalProps> = ({ 
 
                 <div className="relative z-10 w-full max-w-md bg-white dark:bg-slate-900 rounded-xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
                     <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800">
-                        <h3 id={headingId} className="font-bold text-slate-900 dark:text-white">Gerenciar Ciclos de Vida</h3>
+                        <h3 id={headingId} className="font-bold text-slate-900 dark:text-white">{t('title')}</h3>
                         <button
                             onClick={onClose}
-                            aria-label="Fechar modal"
+                            aria-label={t('closeAriaLabel')}
                             className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors focus-visible-ring"
                         >
                             <X size={20} className="text-slate-500" aria-hidden="true" />
@@ -155,10 +157,10 @@ export const LifecycleSettingsModal: React.FC<LifecycleSettingsModalProps> = ({ 
                                         className="p-1.5 text-slate-400 hover:text-red-500 disabled:opacity-30 disabled:cursor-not-allowed ml-1"
                                         title={
                                             stage.isDefault
-                                                ? "Estágio padrão não pode ser removido"
+                                                ? t('removeDisabledDefault')
                                                 : (stageCounts[stage.id] || 0) > 0
-                                                    ? "Não é possível remover estágio com contatos vinculados"
-                                                    : "Remover estágio"
+                                                    ? t('removeDisabledContacts')
+                                                    : t('removeStage')
                                         }
                                     >
                                         <Trash2 size={14} />
@@ -177,7 +179,7 @@ export const LifecycleSettingsModal: React.FC<LifecycleSettingsModalProps> = ({ 
                                     value={newStageName}
                                     onChange={(e) => setNewStageName(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-                                    placeholder="Nome do novo estágio..."
+                                    placeholder={t('newStagePlaceholder')}
                                     className="flex-1 bg-transparent text-sm outline-none text-slate-900 dark:text-white placeholder:text-slate-400"
                                 />
                                 <button
@@ -200,7 +202,7 @@ export const LifecycleSettingsModal: React.FC<LifecycleSettingsModalProps> = ({ 
                                 className="w-full py-2 flex items-center justify-center gap-2 text-sm text-slate-500 hover:text-primary-600 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg border border-dashed border-slate-300 dark:border-slate-700 transition-all"
                             >
                                 <Plus size={16} />
-                                Adicionar Estágio
+                                {t('addStage')}
                             </button>
                         )}
                     </div>

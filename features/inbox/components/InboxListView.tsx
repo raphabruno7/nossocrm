@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Activity } from '@/types';
 import { AISuggestion } from '../hooks/useInboxController';
 import { InboxSection } from './InboxSection';
@@ -50,6 +51,7 @@ const SuggestionRow: React.FC<{
   onSnooze: () => void;
 }> = ({ suggestion, onAccept, onDismiss, onSnooze }) => {
   const router = useRouter();
+  const tSuggestions = useTranslations('inbox.listView');
 
   const getIcon = () => {
     switch (suggestion.type) {
@@ -104,24 +106,24 @@ const SuggestionRow: React.FC<{
         <button
           onClick={onAccept}
           className="p-1.5 text-slate-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-500/10 rounded-md transition-colors"
-          aria-label="Aplicar sugestão"
-          title="Aplicar"
+          aria-label={tSuggestions('applyAriaLabel')}
+          title={tSuggestions('applyTitle')}
         >
           <Check size={14} aria-hidden="true" />
         </button>
         <button
           onClick={onSnooze}
           className="p-1.5 text-slate-400 hover:text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-500/10 rounded-md transition-colors"
-          aria-label="Adiar sugestão"
-          title="Adiar"
+          aria-label={tSuggestions('snoozeAriaLabel')}
+          title={tSuggestions('snoozeTitle')}
         >
           <Clock size={14} aria-hidden="true" />
         </button>
         <button
           onClick={onDismiss}
           className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-md transition-colors"
-          aria-label="Descartar sugestão"
-          title="Descartar"
+          aria-label={tSuggestions('discardAriaLabel')}
+          title={tSuggestions('discardTitle')}
         >
           <X size={14} aria-hidden="true" />
         </button>
@@ -172,6 +174,7 @@ const AISuggestionsCard: React.FC<{
     }
   }, [defaultShowAll]);
 
+  const t = useTranslations('inbox.listView');
   if (suggestions.length === 0) return null;
 
   const visibleSuggestions = showAll ? suggestions : suggestions.slice(0, MAX_SUGGESTIONS);
@@ -186,7 +189,7 @@ const AISuggestionsCard: React.FC<{
         <div className="p-1.5 rounded-lg bg-primary-100 dark:bg-primary-500/20">
           <Sparkles size={16} className="text-primary-600 dark:text-primary-400" />
         </div>
-        <span className="font-semibold text-slate-900 dark:text-white">Sugestões da IA</span>
+        <span className="font-semibold text-slate-900 dark:text-white">{t('aiSuggestions')}</span>
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary-200 dark:bg-primary-500/30 text-primary-700 dark:text-primary-300">
           {suggestions.length}
         </span>
@@ -292,6 +295,8 @@ export const InboxListView: React.FC<InboxListViewProps> = ({
     && upcomingActivities.length === 0
     && aiSuggestions.length === 0;
 
+  const t = useTranslations('inbox.listView');
+
   if (isEmpty) {
     return <InboxZeroState />;
   }
@@ -311,7 +316,7 @@ export const InboxListView: React.FC<InboxListViewProps> = ({
       {/* Activities */}
       <div className="space-y-2">
         <InboxSection
-          title="Atrasados"
+          title={t('overdueTitle')}
           activities={overdueActivities}
           color="red"
           filterParam="overdue"
@@ -323,7 +328,7 @@ export const InboxListView: React.FC<InboxListViewProps> = ({
 
         {/* Hoje separado: Reuniões vs Tarefas */}
         <InboxSection
-          title="Reuniões Hoje"
+          title={t('meetingsTodayTitle')}
           activities={todayMeetings}
           color="green"
           filterParam="today"
@@ -334,7 +339,7 @@ export const InboxListView: React.FC<InboxListViewProps> = ({
         />
 
         <InboxSection
-          title="Tarefas Hoje"
+          title={t('tasksTodayTitle')}
           activities={todayTasks}
           color="green"
           filterParam="today"
@@ -345,7 +350,7 @@ export const InboxListView: React.FC<InboxListViewProps> = ({
         />
 
         <InboxSection
-          title="Próximos"
+          title={t('upcomingTitle')}
           activities={upcomingActivities}
           color="slate"
           filterParam="upcoming"

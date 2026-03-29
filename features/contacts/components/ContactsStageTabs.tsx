@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { ContactStage } from '@/types';
 import { Users, UserCheck, Handshake, Crown, Archive } from 'lucide-react';
 
@@ -15,44 +16,6 @@ interface ContactsStageTabs {
   onStageChange: (stage: ContactStage | 'ALL') => void;
   counts: StageCounts;
 }
-
-const STAGE_CONFIG = {
-  LEAD: {
-    label: 'Leads',
-    icon: Users,
-    color: 'bg-slate-500',
-    activeColor:
-      'bg-slate-100 dark:bg-slate-500/20 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-500/30',
-  },
-  MQL: {
-    label: 'MQL',
-    icon: UserCheck,
-    color: 'bg-blue-500',
-    activeColor:
-      'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-500/30',
-  },
-  PROSPECT: {
-    label: 'Prospects',
-    icon: Handshake,
-    color: 'bg-purple-500',
-    activeColor:
-      'bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-500/30',
-  },
-  CUSTOMER: {
-    label: 'Clientes',
-    icon: Crown,
-    color: 'bg-green-500',
-    activeColor:
-      'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-300 border-green-300 dark:border-green-500/30',
-  },
-  OTHER: {
-    label: 'Outros / Perdidos',
-    icon: Archive,
-    color: 'bg-slate-500',
-    activeColor:
-      'bg-slate-100 dark:bg-slate-500/20 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-500/30',
-  },
-};
 
 /**
  * Componente React `ContactsStageTabs`.
@@ -73,6 +36,44 @@ export const ContactsStageTabs: React.FC<ContactsStageTabs> = ({
   onStageChange,
   counts,
 }) => {
+  const t = useTranslations('contacts.stageTabs');
+  const stageConfig = {
+    LEAD: {
+      label: t('lead'),
+      icon: Users,
+      color: 'bg-slate-500',
+      activeColor:
+        'bg-slate-100 dark:bg-slate-500/20 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-500/30',
+    },
+    MQL: {
+      label: t('mql'),
+      icon: UserCheck,
+      color: 'bg-blue-500',
+      activeColor:
+        'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-500/30',
+    },
+    PROSPECT: {
+      label: t('prospect'),
+      icon: Handshake,
+      color: 'bg-purple-500',
+      activeColor:
+        'bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-500/30',
+    },
+    CUSTOMER: {
+      label: t('customer'),
+      icon: Crown,
+      color: 'bg-green-500',
+      activeColor:
+        'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-300 border-green-300 dark:border-green-500/30',
+    },
+    OTHER: {
+      label: t('other'),
+      icon: Archive,
+      color: 'bg-slate-500',
+      activeColor:
+        'bg-slate-100 dark:bg-slate-500/20 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-500/30',
+    },
+  } as const;
   const total = counts.LEAD + counts.MQL + counts.PROSPECT + counts.CUSTOMER + (counts.OTHER || 0);
 
   return (
@@ -86,7 +87,7 @@ export const ContactsStageTabs: React.FC<ContactsStageTabs> = ({
             : 'bg-white dark:bg-white/5 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10'
         }`}
       >
-        Todos
+        {t('all')}
         <span
           className={`text-xs px-1.5 py-0.5 rounded-full ${
             activeStage === 'ALL'
@@ -99,7 +100,7 @@ export const ContactsStageTabs: React.FC<ContactsStageTabs> = ({
       </button>
 
       {/* Stage Tabs */}
-      {Object.entries(STAGE_CONFIG).map(([stage, config]) => {
+      {Object.entries(stageConfig).map(([stage, config]) => {
         const Icon = config.icon;
         const count = counts[stage as keyof StageCounts];
         const isActive = activeStage === stage;
@@ -138,7 +139,15 @@ export const ContactsStageTabs: React.FC<ContactsStageTabs> = ({
  * @returns {Element} Retorna um valor do tipo `Element`.
  */
 export const StageBadge: React.FC<{ stage: ContactStage | string }> = ({ stage }) => {
-  const config = STAGE_CONFIG[stage];
+  const t = useTranslations('contacts.stageTabs');
+  const stageConfig = {
+    LEAD: { label: t('lead'), activeColor: 'bg-slate-100 dark:bg-slate-500/20 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-500/30' },
+    MQL: { label: t('mql'), activeColor: 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-500/30' },
+    PROSPECT: { label: t('prospect'), activeColor: 'bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-500/30' },
+    CUSTOMER: { label: t('customer'), activeColor: 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-300 border-green-300 dark:border-green-500/30' },
+    OTHER: { label: t('other'), activeColor: 'bg-slate-100 dark:bg-slate-500/20 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-500/30' },
+  } as const;
+  const config = stageConfig[stage as keyof typeof stageConfig];
 
   if (!config) {
     return (

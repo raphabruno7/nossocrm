@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Phone, PhoneOff, Check, XCircle, Voicemail, Clock, FileText, Copy, ExternalLink } from 'lucide-react';
 import { normalizePhoneE164 } from '@/lib/phone';
+import { useTranslations } from 'next-intl';
 
 interface CallModalProps {
     isOpen: boolean;
@@ -53,6 +54,7 @@ export const CallModal: React.FC<CallModalProps> = ({
     const [notes, setNotes] = useState('');
     const [title, setTitle] = useState(suggestedTitle);
     const [copied, setCopied] = useState(false);
+    const t = useTranslations('inbox.callModal');
 
     const phone = normalizePhoneE164(contactPhone);
 
@@ -167,8 +169,8 @@ export const CallModal: React.FC<CallModalProps> = ({
                                                 type="button"
                                                 onClick={handleOpenPhoneApp}
                                                 className="p-1 rounded-md hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
-                                                title="Abrir no discador"
-                                                aria-label="Abrir no discador"
+                                                title={t('openDialerTitle')}
+                                                aria-label={t('openDialerAriaLabel')}
                                             >
                                                 <ExternalLink size={12} />
                                             </button>
@@ -241,7 +243,7 @@ export const CallModal: React.FC<CallModalProps> = ({
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             className="w-full px-3 py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 text-sm"
-                            placeholder="Ex: Ligação de follow-up"
+                            placeholder={t('titlePlaceholder')}
                         />
                     </div>
 
@@ -254,7 +256,7 @@ export const CallModal: React.FC<CallModalProps> = ({
                         <textarea
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
-                            placeholder="O que foi discutido? Próximos passos?"
+                            placeholder={t('notesPlaceholder')}
                             className="w-full px-3 py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 text-sm resize-y min-h-40 max-h-[40vh]"
                             rows={6}
                         />
@@ -284,10 +286,10 @@ export const CallModal: React.FC<CallModalProps> = ({
                         onClick={handleOpenPhoneApp}
                         disabled={!phone}
                         className="flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold bg-yellow-500 hover:bg-yellow-600 text-black transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                        title="Abrir no discador"
+                        title={t('openDialerTitle')}
                     >
                         <ExternalLink size={16} />
-                        Abrir no discador
+                        {t('openDialerTitle')}
                     </button>
                     <button
                         onClick={handleSave}

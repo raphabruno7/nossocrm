@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -112,6 +113,7 @@ export const InboxFocusView: React.FC<InboxFocusViewProps> = ({
     setSidebarCollapsed,
   } = useCRM();
   const { profile } = useAuth();
+  const t = useTranslations('inbox.focusView');
 
   useEffect(() => {
     // UX: when moving between items, reset any manual context selection.
@@ -440,7 +442,7 @@ export const InboxFocusView: React.FC<InboxFocusViewProps> = ({
             />
 
             <Maximize2 size={14} className="relative z-10" />
-            <span className="relative z-10">{hasResolvedContext ? 'Ver detalhes' : 'Vincular contexto'}</span>
+            <span className="relative z-10">{hasResolvedContext ? t('linkContextTitle') : t('linkContext')}</span>
             <kbd className="hidden group-hover:inline-flex h-5 items-center gap-1 rounded border border-yellow-500/20 bg-yellow-500/10 px-1.5 font-mono text-[10px] font-medium text-yellow-500/50 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out translate-x-1 group-hover:translate-x-0 ml-2">
               SPACE
             </kbd>
@@ -449,13 +451,13 @@ export const InboxFocusView: React.FC<InboxFocusViewProps> = ({
       )}
 
       {/* Ações */}
-      <div className="flex items-center gap-4 mt-8" role="group" aria-label="Ações">
+      <div className="flex items-center gap-4 mt-8" role="group" aria-label={t('actionsLabel')}>
         <button
           onClick={onSnooze}
           className="group flex items-center gap-3 px-6 py-3 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-all font-medium border border-transparent hover:border-slate-300 dark:hover:border-white/10"
         >
           <Clock size={18} aria-hidden="true" className="text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200" />
-          <span>Adiar</span>
+          <span>{t('snooze')}</span>
           <kbd className="hidden group-hover:inline-flex h-5 items-center justify-center rounded border border-slate-300 dark:border-white/10 bg-slate-200 dark:bg-white/5 px-1.5 font-mono text-[10px] uppercase text-slate-500 font-bold opacity-0 group-hover:opacity-100 transition-all">
             A
           </kbd>
@@ -468,7 +470,7 @@ export const InboxFocusView: React.FC<InboxFocusViewProps> = ({
           <div className="p-1 bg-white/20 rounded-full">
             <Check size={20} aria-hidden="true" strokeWidth={3} />
           </div>
-          <span className="text-shadow-sm">Feito</span>
+          <span className="text-shadow-sm">{t('done')}</span>
           <kbd className="ml-1 inline-flex h-6 items-center justify-center rounded bg-black/10 px-2 font-sans text-xs text-white/70 font-semibold border border-white/10">
             ⏎
           </kbd>
@@ -478,7 +480,7 @@ export const InboxFocusView: React.FC<InboxFocusViewProps> = ({
           onClick={onSkip}
           className="group flex items-center gap-3 px-6 py-3 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-all font-medium border border-transparent hover:border-slate-300 dark:hover:border-white/10"
         >
-          <span>Pular</span>
+          <span>{t('skip')}</span>
           <kbd className="hidden group-hover:inline-flex h-5 items-center justify-center rounded border border-slate-300 dark:border-white/10 bg-slate-200 dark:bg-white/5 px-1.5 font-mono text-[10px] uppercase text-slate-500 font-bold opacity-0 group-hover:opacity-100 transition-all">
             P
           </kbd>
@@ -487,11 +489,11 @@ export const InboxFocusView: React.FC<InboxFocusViewProps> = ({
       </div>
 
       {/* Navegação */}
-      <nav aria-label="Navegação entre itens" className="flex items-center gap-6 mt-12">
+      <nav aria-label={t('navLabel')} className="flex items-center gap-6 mt-12">
         <button
           onClick={onPrev}
           disabled={currentIndex === 0}
-          aria-label="Item anterior"
+          aria-label={t('prevAriaLabel')}
           className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         >
           <ChevronLeft size={24} aria-hidden="true" />
@@ -517,7 +519,7 @@ export const InboxFocusView: React.FC<InboxFocusViewProps> = ({
         <button
           onClick={onNext}
           disabled={currentIndex >= totalItems - 1}
-          aria-label="Próximo item"
+          aria-label={t('nextAriaLabel')}
           className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         >
           <ChevronRight size={24} aria-hidden="true" />
@@ -571,12 +573,12 @@ export const InboxFocusView: React.FC<InboxFocusViewProps> = ({
               className="fixed inset-0 md:left-[var(--app-sidebar-width,0px)] z-[9999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
               role="dialog"
               aria-modal="true"
-              aria-label="Vincular contexto"
+              aria-label={t('linkContext')}
             >
               <div className="w-full max-w-xl rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-white/10 shadow-2xl p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="text-sm font-semibold text-slate-900 dark:text-white">Vincular contexto</div>
+                    <div className="text-sm font-semibold text-slate-900 dark:text-white">{t('linkContextTitle')}</div>
                     <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                       Esta atividade não tem deal/contato associado. Selecione um negócio para abrir o Cockpit.
                     </div>
@@ -584,7 +586,7 @@ export const InboxFocusView: React.FC<InboxFocusViewProps> = ({
                   <button
                     onClick={() => setShowContext(false)}
                     className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
-                    aria-label="Fechar"
+                    aria-label={t('closeAriaLabel')}
                   >
                     ×
                   </button>
@@ -594,7 +596,7 @@ export const InboxFocusView: React.FC<InboxFocusViewProps> = ({
                   <input
                     value={contextSearch}
                     onChange={e => setContextSearch(e.target.value)}
-                    placeholder="Buscar negócio pelo título…"
+                    placeholder={t('searchDealPlaceholder')}
                     className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-2 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-primary-500/40"
                   />
                 </div>

@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useToast } from '@/context/ToastContext';
 import { Contact, Company, ContactStage, PaginationState, ContactsServerFilters, DEFAULT_PAGE_SIZE, ContactSortableColumn } from '@/types';
 import {
@@ -28,6 +29,8 @@ import { generateFakeContacts } from '@/lib/debug';
  * @returns {{ search: string; setSearch: Dispatch<SetStateAction<string>>; statusFilter: "ALL" | "ACTIVE" | "INACTIVE" | "CHURNED" | "RISK"; setStatusFilter: Dispatch<SetStateAction<"ALL" | ... 3 more ... | "RISK">>; ... 51 more ...; addToast: (message: string, type?: ToastType | undefined) => void; }} Retorna um valor do tipo `{ search: string; setSearch: Dispatch<SetStateAction<string>>; statusFilter: "ALL" | "ACTIVE" | "INACTIVE" | "CHURNED" | "RISK"; setStatusFilter: Dispatch<SetStateAction<"ALL" | ... 3 more ... | "RISK">>; ... 51 more ...; addToast: (message: string, type?: ToastType | undefined) => void; }`.
  */
 export const useContactsController = () => {
+  const t = useTranslations('contacts.toast');
+  const listT = useTranslations('contacts.list');
   // T017: Pagination state
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -215,28 +218,28 @@ export const useContactsController = () => {
         { id: editingCompany.id, updates: { ...data } },
         {
           onSuccess: () => {
-            (addToast || showToast)('Empresa atualizada!', 'success');
+            (addToast || showToast)(t('companyUpdated'), 'success');
             setIsCompanyModalOpen(false);
             setEditingCompany(null);
           },
           onError: (error: Error) => {
-            (addToast || showToast)(`Erro ao atualizar empresa: ${error.message}`, 'error');
+            (addToast || showToast)(t('companyUpdateError', { message: error.message }), 'error');
           },
         }
       );
     } else {
       // Close immediately for better UX (same pattern as contact creation)
       setIsCompanyModalOpen(false);
-      (addToast || showToast)('Criando empresa...', 'info');
+      (addToast || showToast)(t('creatingCompany'), 'info');
 
       createCompanyMutation.mutate(
         { name: data.name, industry: data.industry || '', website: data.website || '' } as any,
         {
           onSuccess: () => {
-            (addToast || showToast)('Empresa criada!', 'success');
+            (addToast || showToast)(t('companyCreated'), 'success');
           },
           onError: (error: Error) => {
-            (addToast || showToast)(`Erro ao criar empresa: ${error.message}`, 'error');
+            (addToast || showToast)(t('companyCreateError', { message: error.message }), 'error');
             // Re-open modal so user can retry
             setIsCompanyModalOpen(true);
           },
@@ -249,12 +252,12 @@ export const useContactsController = () => {
     if (!deleteCompanyId) return;
     // Close confirm modal immediately to avoid "stuck" feeling
     setDeleteCompanyId(null);
-    (addToast || showToast)('Excluindo empresa...', 'info');
+    (addToast || showToast)(t('deletingCompany'), 'info');
     try {
       await deleteCompanyMutation.mutateAsync(deleteCompanyId);
-      (addToast || showToast)('Empresa excluída com sucesso', 'success');
+      (addToast || showToast)(t('companyDeleted'), 'success');
     } catch (e) {
-      (addToast || showToast)(`Erro ao excluir empresa: ${(e as Error).message}`, 'error');
+      (addToast || showToast)(t('companyDeleteError', { message: (e as Error).message }), 'error');
     }
   };
 
@@ -276,16 +279,16 @@ export const useContactsController = () => {
           { id: deleteId },
           {
             onSuccess: () => {
-              (addToast || showToast)('Contato excluído com sucesso', 'success');
+              (addToast || showToast)(t('contactDeleted'), 'success');
               setDeleteId(null);
             },
             onError: (error: Error) => {
-              (addToast || showToast)(`Erro ao excluir: ${error.message}`, 'error');
+              (addToast || showToast)(t('deleteError', { message: error.message }), 'error');
             },
           }
         );
       } catch (error) {
-        (addToast || showToast)('Erro ao verificar negócios do contato', 'error');
+        (addToast || showToast)(t('checkDealsError'), 'error');
       }
     }
   };
@@ -296,11 +299,11 @@ export const useContactsController = () => {
         { id: deleteWithDeals.id, forceDeleteDeals: true },
         {
           onSuccess: () => {
-            (addToast || showToast)(`Contato e ${deleteWithDeals.dealCount} negócio(s) excluídos`, 'success');
+            (addToast || showToast)(t('contactAndDealsDeleted', { count: deleteWithDeals.dealCount }), 'success');
             setDeleteWithDeals(null);
           },
           onError: (error: Error) => {
-            (addToast || showToast)(`Erro ao excluir: ${error.message}`, 'error');
+            (addToast || showToast)(t('deleteError', { message: error.message }), 'error');
           },
         }
       );
@@ -363,13 +366,17 @@ export const useContactsController = () => {
 
     if (successCount > 0) {
       (addToast || showToast)(
-        `${successCount} ${viewMode === 'companies' ? 'empresa(s)' : 'contato(s)'} excluído(s)`,
+        viewMode === 'companies'
+          ? t('bulkDeletedCompanies', { count: successCount })
+          : t('bulkDeletedPeople', { count: successCount }),
         'success'
       );
     }
     if (errorCount > 0) {
       (addToast || showToast)(
-        `Falha ao excluir ${errorCount} ${viewMode === 'companies' ? 'empresa(s)' : 'contato(s)'}`,
+        viewMode === 'companies'
+          ? t('bulkDeleteErrorCompanies', { count: errorCount })
+          : t('bulkDeleteErrorPeople', { count: errorCount }),
         'error'
       );
     }
@@ -389,7 +396,7 @@ export const useContactsController = () => {
     // (TanStack Query does not support onMutate in mutate() call options.)
     if (!editingContact) {
       setIsModalOpen(false);
-      (addToast || showToast)('Criando contato...', 'info');
+      (addToast || showToast)(t('creatingContact'), 'info');
     }
 
     // Find or create company
@@ -435,7 +442,7 @@ export const useContactsController = () => {
         },
         {
           onSuccess: () => {
-            (addToast || showToast)('Contato atualizado!', 'success');
+            (addToast || showToast)(t('contactUpdated'), 'success');
             setIsModalOpen(false);
           },
           onSettled: () => setIsSubmittingContact(false),
@@ -456,10 +463,10 @@ export const useContactsController = () => {
         },
         {
           onSuccess: () => {
-            (addToast || showToast)('Contato criado!', 'success');
+            (addToast || showToast)(t('contactCreated'), 'success');
           },
           onError: (error: Error) => {
-            (addToast || showToast)(`Erro ao criar contato: ${error.message}`, 'error');
+            (addToast || showToast)(t('contactCreateError', { message: error.message }), 'error');
             // Re-open modal so user can adjust and retry
             setIsModalOpen(true);
           },
@@ -508,13 +515,13 @@ export const useContactsController = () => {
       createdCount++;
     }
 
-    (addToast || showToast)(`${createdCount} contatos fake criados!`, 'success');
-  }, [addToast, showToast, companies, createCompanyMutation, createContactMutation]);
+    (addToast || showToast)(t('fakeContactsCreated', { count: createdCount }), 'success');
+  }, [addToast, showToast, companies, createCompanyMutation, createContactMutation, t]);
 
   // Open modal to select board for deal creation (or create directly if only 1 board)
   const convertContactToDeal = (contactId: string) => {
     if (boards.length === 0) {
-      addToast('Nenhum board disponível. Crie um board primeiro.', 'error');
+      addToast(t('noBoards'), 'error');
       return;
     }
 
@@ -533,12 +540,12 @@ export const useContactsController = () => {
     const contact = contacts.find(c => c.id === contactId);
 
     if (!contact) {
-      addToast('Contato não encontrado', 'error');
+      addToast(t('contactNotFound'), 'error');
       return;
     }
 
     if (!board.stages?.length) {
-      addToast('Board não tem estágios configurados', 'error');
+      addToast(t('boardWithoutStages'), 'error');
       console.error('Board sem stages:', board);
       return;
     }
@@ -566,10 +573,10 @@ export const useContactsController = () => {
       },
       {
         onSuccess: () => {
-          addToast(`Deal criado no board "${board.name}"`, 'success');
+          addToast(t('dealCreated', { boardName: board.name }), 'success');
         },
         onError: (error: Error) => {
-          addToast(`Erro ao criar deal: ${error.message}`, 'error');
+          addToast(t('dealCreateError', { message: error.message }), 'error');
         },
       }
     );
@@ -581,7 +588,7 @@ export const useContactsController = () => {
     const board = boards.find(b => b.id === boardId);
 
     if (!contact || !board) {
-      addToast('Erro ao criar deal', 'error');
+      addToast(t('createDealError'), 'error');
       setCreateDealContactId(null);
       return;
     }
@@ -622,17 +629,17 @@ export const useContactsController = () => {
   const companyNameById = useMemo(() => {
     const map = new Map<string, string>();
     for (const c of companies) {
-      if (c?.id) map.set(c.id, c.name || 'Empresa não vinculada');
+      if (c?.id) map.set(c.id, c.name || listT('fallbacks.unlinkedCompany'));
     }
     return map;
-  }, [companies]);
+  }, [companies, listT]);
 
   const getCompanyName = useCallback(
     (clientCompanyId: string | undefined | null) => {
-      if (!clientCompanyId) return 'Empresa não vinculada';
-      return companyNameById.get(clientCompanyId) || 'Empresa não vinculada';
+      if (!clientCompanyId) return listT('fallbacks.unlinkedCompany');
+      return companyNameById.get(clientCompanyId) || listT('fallbacks.unlinkedCompany');
     },
-    [companyNameById]
+    [companyNameById, listT]
   );
 
   // T031: Stage counts from server (RPC)

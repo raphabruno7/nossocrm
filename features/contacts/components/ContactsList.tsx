@@ -1,23 +1,25 @@
 import React from 'react';
-import { Building2, Mail, Phone, Plus, Calendar, Pencil, Trash2, Globe, MoreHorizontal, ArrowUpDown, ArrowUp, ArrowDown, MessageCircle } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
+import { Building2, Mail, Phone, Plus, Calendar, Pencil, Trash2, Globe, ArrowUpDown, ArrowUp, ArrowDown, MessageCircle } from 'lucide-react';
 import { Contact, Company, ContactSortableColumn } from '@/types';
 import { StageBadge } from './ContactsStageTabs';
-
-// Performance: reuse Intl formatters (they are relatively expensive to instantiate).
-const PT_BR_DATE_FORMATTER = new Intl.DateTimeFormat('pt-BR');
-const PT_BR_DATE_TIME_FORMATTER = new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-});
 
 /**
  * Formata uma data para exibição relativa (ex: "Hoje", "Ontem", "Há 3 dias", "15/11/2024")
  */
-function formatRelativeDate(dateString: string | undefined | null, now: Date): string {
-    if (!dateString) return '---';
+function formatRelativeDate(
+    dateString: string | undefined | null,
+    now: Date,
+    dateFormatter: Intl.DateTimeFormat,
+    labels: {
+        none: string;
+        today: string;
+        yesterday: string;
+        daysAgo: (count: number) => string;
+        weeksAgo: (count: number) => string;
+    }
+): string {
+    if (!dateString) return labels.none;
     
     const date = new Date(dateString);
     
@@ -28,18 +30,19 @@ function formatRelativeDate(dateString: string | undefined | null, now: Date): s
     const diffTime = today.getTime() - dateDay.getTime();
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
-    if (diffDays === 0) return 'Hoje';
-    if (diffDays === 1) return 'Ontem';
-    if (diffDays < 7) return `Há ${diffDays} dias`;
-    if (diffDays < 30) return `Há ${Math.floor(diffDays / 7)} sem.`;
+    if (diffDays === 0) return labels.today;
+    if (diffDays === 1) return labels.yesterday;
+    if (diffDays < 7) return labels.daysAgo(diffDays);
+    if (diffDays < 30) return labels.weeksAgo(Math.floor(diffDays / 7));
     
     // For older dates, show the actual date
-    return PT_BR_DATE_FORMATTER.format(date);
+    return dateFormatter.format(date);
 }
 
 /** Props for sortable column header */
 interface SortableHeaderProps {
     label: string;
+    sortAriaLabel: string;
     column: ContactSortableColumn;
     currentSort: ContactSortableColumn;
     sortOrder: 'asc' | 'desc';
@@ -47,7 +50,7 @@ interface SortableHeaderProps {
 }
 
 /** Sortable column header component */
-const SortableHeader: React.FC<SortableHeaderProps> = ({ label, column, currentSort, sortOrder, onSort }) => {
+const SortableHeader: React.FC<SortableHeaderProps> = ({ label, sortAriaLabel, column, currentSort, sortOrder, onSort }) => {
     const isActive = currentSort === column;
     
     return (
@@ -55,7 +58,7 @@ const SortableHeader: React.FC<SortableHeaderProps> = ({ label, column, currentS
             <button
                 onClick={() => onSort(column)}
                 className="flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider hover:text-primary-600 dark:hover:text-primary-400 transition-colors group"
-                aria-label={`Ordenar por ${label}`}
+                aria-label={sortAriaLabel}
             >
                 {label}
                 <span className={`transition-opacity ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-50'}`}>
@@ -150,6 +153,9 @@ export const ContactsList: React.FC<ContactsListProps> = ({
     sortOrder = 'desc',
     onSort,
 }) => {
+    const t = useTranslations('contacts.list');
+    const locale = useLocale();
+    const localeTag = locale === 'pt' ? 'pt-BR' : 'en-US';
     const activeListIds = viewMode === 'people'
         ? filteredContacts.map(c => c.id)
         : filteredCompanies.map(c => c.id);
@@ -174,6 +180,36 @@ export const ContactsList: React.FC<ContactsListProps> = ({
     // Memoized para evitar hydration mismatch (server vs client timestamp) e
     // evitar recriação a cada render
     const now = React.useMemo(() => new Date(), []);
+    const dateFormatter = React.useMemo(() => new Intl.DateTimeFormat(localeTag), [localeTag]);
+    const dateTimeFormatter = React.useMemo(
+        () =>
+            new Intl.DateTimeFormat(localeTag, {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+            }),
+        [localeTag]
+    );
+    const relativeDateLabels = React.useMemo(
+        () => ({
+            none: t('relativeDate.none'),
+            today: t('relativeDate.today'),
+            yesterday: t('relativeDate.yesterday'),
+            daysAgo: (count: number) => t('relativeDate.daysAgo', { count }),
+            weeksAgo: (count: number) => t('relativeDate.weeksAgo', { count }),
+        }),
+        [t]
+    );
+    const statusLabels = React.useMemo(
+        () => ({
+            ACTIVE: t('status.active'),
+            INACTIVE: t('status.inactive'),
+            CHURNED: t('status.lost'),
+        }),
+        [t]
+    );
     
     return (
         <div className="glass rounded-xl border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden">
@@ -188,30 +224,51 @@ export const ContactsList: React.FC<ContactsListProps> = ({
                                         checked={allSelected}
                                         ref={(el) => { if (el) el.indeterminate = someSelected; }}
                                         onChange={toggleSelectAll}
-                                        aria-label={allSelected ? 'Desmarcar todos os contatos' : 'Selecionar todos os contatos'}
+                                        aria-label={t('selection.allContacts')}
                                         className="rounded border-slate-300 text-primary-600 focus:ring-primary-500 dark:bg-white/5 dark:border-white/10" 
                                     />
                                 </th>
                                 {onSort ? (
-                                    <SortableHeader label="Nome" column="name" currentSort={sortBy} sortOrder={sortOrder} onSort={onSort} />
+                                    <SortableHeader
+                                        label={t('headers.name')}
+                                        sortAriaLabel={t('sortBy', { label: t('headers.name') })}
+                                        column="name"
+                                        currentSort={sortBy}
+                                        sortOrder={sortOrder}
+                                        onSort={onSort}
+                                    />
                                 ) : (
-                                    <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">Nome</th>
+                                    <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">{t('headers.name')}</th>
                                 )}
-                                <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">Estágio</th>
-                                <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">Cargo / Empresa</th>
-                                <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">Contato</th>
-                                <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">Status</th>
+                                <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">{t('headers.stage')}</th>
+                                <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">{t('headers.roleCompany')}</th>
+                                <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">{t('headers.contact')}</th>
+                                <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">{t('headers.status')}</th>
                                 {onSort ? (
-                                    <SortableHeader label="Criado" column="created_at" currentSort={sortBy} sortOrder={sortOrder} onSort={onSort} />
+                                    <SortableHeader
+                                        label={t('headers.created')}
+                                        sortAriaLabel={t('sortBy', { label: t('headers.created') })}
+                                        column="created_at"
+                                        currentSort={sortBy}
+                                        sortOrder={sortOrder}
+                                        onSort={onSort}
+                                    />
                                 ) : (
-                                    <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">Criado</th>
+                                    <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">{t('headers.created')}</th>
                                 )}
                                 {onSort ? (
-                                    <SortableHeader label="Modificado" column="updated_at" currentSort={sortBy} sortOrder={sortOrder} onSort={onSort} />
+                                    <SortableHeader
+                                        label={t('headers.modified')}
+                                        sortAriaLabel={t('sortBy', { label: t('headers.modified') })}
+                                        column="updated_at"
+                                        currentSort={sortBy}
+                                        sortOrder={sortOrder}
+                                        onSort={onSort}
+                                    />
                                 ) : (
-                                    <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">Modificado</th>
+                                    <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">{t('headers.modified')}</th>
                                 )}
-                                <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider"><span className="sr-only">Ações</span></th>
+                                <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider"><span className="sr-only">{t('headers.actions')}</span></th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -222,7 +279,7 @@ export const ContactsList: React.FC<ContactsListProps> = ({
                                             type="checkbox" 
                                             checked={selectedIds.has(contact.id)}
                                             onChange={() => toggleSelect(contact.id)}
-                                            aria-label={`Selecionar ${contact.name}`}
+                                            aria-label={t('selection.contact', { name: contact.name })}
                                             className="rounded border-slate-300 text-primary-600 focus:ring-primary-500 dark:bg-white/5 dark:border-white/10" 
                                         />
                                     </td>
@@ -232,8 +289,8 @@ export const ContactsList: React.FC<ContactsListProps> = ({
                                                 type="button"
                                                 onClick={() => openEditModal(contact)}
                                                 className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900 dark:to-primary-800 text-primary-700 dark:text-primary-200 flex items-center justify-center font-bold text-sm shadow-sm ring-2 ring-white dark:ring-white/5 hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-dark-card"
-                                                aria-label={`Editar contato: ${contact.name || 'Sem nome'}`}
-                                                title={contact.name || 'Sem nome'}
+                                                aria-label={t('actions.editContactAvatar', { name: contact.name || t('fallbacks.unnamedContact') })}
+                                                title={contact.name || t('fallbacks.unnamedContact')}
                                             >
                                                 {(contact.name || '?').charAt(0)}
                                             </button>
@@ -247,7 +304,7 @@ export const ContactsList: React.FC<ContactsListProps> = ({
                                     </td>
                                     <td className="px-6 py-4">
                                         <div>
-                                            <span className="text-slate-900 dark:text-white font-medium block">{contact.role || 'Cargo não inf.'}</span>
+                                            <span className="text-slate-900 dark:text-white font-medium block">{contact.role || t('fallbacks.roleNotInformed')}</span>
                                             <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                                                 <Building2 size={10} />
                                                 <span>{getCompanyName(contact.clientCompanyId)}</span>
@@ -285,18 +342,29 @@ export const ContactsList: React.FC<ContactsListProps> = ({
                                                     const nextStatus = contact.status === 'ACTIVE' ? 'INACTIVE' : contact.status === 'INACTIVE' ? 'CHURNED' : 'ACTIVE';
                                                     updateContact(contact.id, { status: nextStatus });
                                                 }}
-                                                aria-label={`Alterar status de ${contact.name} de ${contact.status === 'ACTIVE' ? 'ativo' : contact.status === 'INACTIVE' ? 'inativo' : 'perdido'}`}
+                                                aria-label={t('actions.changeStatus', {
+                                                    name: contact.name,
+                                                    status: contact.status === 'ACTIVE'
+                                                        ? t('status.active').toLowerCase()
+                                                        : contact.status === 'INACTIVE'
+                                                            ? t('status.inactive').toLowerCase()
+                                                            : t('status.lost').toLowerCase(),
+                                                })}
                                                 className={`text-[10px] font-bold px-2 py-0.5 rounded-full border transition-all ${contact.status === 'ACTIVE' ? 'bg-green-100 text-green-700 border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20' :
                                                     contact.status === 'INACTIVE' ? 'bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-500/10 dark:text-yellow-400 dark:border-yellow-500/20' :
                                                         'bg-red-100 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20'
                                                     }`}
                                             >
-                                                {contact.status === 'ACTIVE' ? 'ATIVO' : contact.status === 'INACTIVE' ? 'INATIVO' : 'PERDIDO'}
+                                                {contact.status === 'ACTIVE'
+                                                    ? statusLabels.ACTIVE
+                                                    : contact.status === 'INACTIVE'
+                                                        ? statusLabels.INACTIVE
+                                                        : statusLabels.CHURNED}
                                             </button>
                                             <button
                                                 onClick={() => convertContactToDeal(contact.id)}
                                                 className="p-1 text-slate-400 hover:text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 rounded transition-colors"
-                                                aria-label={`Criar oportunidade para ${contact.name}`}
+                                                aria-label={t('actions.createOpportunity', { name: contact.name })}
                                             >
                                                 <Plus size={14} aria-hidden="true" />
                                             </button>
@@ -305,19 +373,19 @@ export const ContactsList: React.FC<ContactsListProps> = ({
                                     <td className="px-6 py-4">
                                         <div
                                             className="flex items-center gap-2 text-slate-600 dark:text-slate-400 text-xs"
-                                            title={contact.createdAt ? PT_BR_DATE_TIME_FORMATTER.format(new Date(contact.createdAt)) : undefined}
+                                            title={contact.createdAt ? dateTimeFormatter.format(new Date(contact.createdAt)) : undefined}
                                         >
                                             <Calendar size={14} className="text-slate-400" />
-                                            <span>{formatRelativeDate(contact.createdAt, now)}</span>
+                                            <span>{formatRelativeDate(contact.createdAt, now, dateFormatter, relativeDateLabels)}</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
                                         <div
                                             className="flex items-center gap-2 text-slate-600 dark:text-slate-400 text-xs"
-                                            title={contact.updatedAt ? PT_BR_DATE_TIME_FORMATTER.format(new Date(contact.updatedAt)) : undefined}
+                                            title={contact.updatedAt ? dateTimeFormatter.format(new Date(contact.updatedAt)) : undefined}
                                         >
                                             <Calendar size={14} className="text-slate-400" />
-                                            <span>{formatRelativeDate(contact.updatedAt, now)}</span>
+                                            <span>{formatRelativeDate(contact.updatedAt, now, dateFormatter, relativeDateLabels)}</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-right">
@@ -325,14 +393,14 @@ export const ContactsList: React.FC<ContactsListProps> = ({
                                             <button
                                                 onClick={() => openEditModal(contact)}
                                                 className="p-1.5 text-slate-400 hover:text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded transition-colors"
-                                                aria-label={`Editar ${contact.name}`}
+                                                aria-label={t('actions.edit', { name: contact.name })}
                                             >
                                                 <Pencil size={16} aria-hidden="true" />
                                             </button>
                                             <button
                                                 onClick={() => setDeleteId(contact.id)}
                                                 className="p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded text-slate-400 hover:text-red-500 transition-colors"
-                                                aria-label={`Excluir ${contact.name}`}
+                                                aria-label={t('actions.delete', { name: contact.name })}
                                             >
                                                 <Trash2 size={16} aria-hidden="true" />
                                             </button>
@@ -352,15 +420,15 @@ export const ContactsList: React.FC<ContactsListProps> = ({
                                         checked={allSelected}
                                         ref={(el) => { if (el) el.indeterminate = someSelected; }}
                                         onChange={toggleSelectAll}
-                                        aria-label={allSelected ? 'Desmarcar todas as empresas' : 'Selecionar todas as empresas'}
+                                        aria-label={t('selection.allCompanies')}
                                         className="rounded border-slate-300 text-primary-600 focus:ring-primary-500 dark:bg-white/5 dark:border-white/10"
                                     />
                                 </th>
-                                <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">Empresa</th>
-                                <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">Setor</th>
-                                <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">Criado em</th>
-                                <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">Pessoas Vinc.</th>
-                                <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider"><span className="sr-only">Ações</span></th>
+                                <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">{t('headers.company')}</th>
+                                <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">{t('headers.industry')}</th>
+                                <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">{t('headers.createdAt')}</th>
+                                <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">{t('headers.linkedPeople')}</th>
+                                <th scope="col" className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider"><span className="sr-only">{t('headers.actions')}</span></th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -368,12 +436,12 @@ export const ContactsList: React.FC<ContactsListProps> = ({
                                 <tr key={company.id} className={`hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors group ${selectedIds.has(company.id) ? 'bg-primary-50/50 dark:bg-primary-900/10' : ''}`}>
                                     <td className="px-6 py-4">
                                         <input
-                                            type="checkbox"
-                                            checked={selectedIds.has(company.id)}
-                                            onChange={() => toggleSelect(company.id)}
-                                            aria-label={`Selecionar ${company.name}`}
-                                            className="rounded border-slate-300 text-primary-600 focus:ring-primary-500 dark:bg-white/5 dark:border-white/10"
-                                        />
+                                        type="checkbox"
+                                        checked={selectedIds.has(company.id)}
+                                        onChange={() => toggleSelect(company.id)}
+                                        aria-label={t('selection.company', { name: company.name })}
+                                        className="rounded border-slate-300 text-primary-600 focus:ring-primary-500 dark:bg-white/5 dark:border-white/10"
+                                    />
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
@@ -393,13 +461,13 @@ export const ContactsList: React.FC<ContactsListProps> = ({
                                                         }`}
                                                         aria-label={
                                                             firstLinkedContact
-                                                                ? `Abrir contato vinculado de ${company.name}`
-                                                                : `Sem contatos vinculados para ${company.name}`
+                                                                ? t('actions.openLinkedContact', { name: company.name })
+                                                                : t('actions.noLinkedContactsFor', { name: company.name })
                                                         }
                                                         title={
                                                             firstLinkedContact
-                                                                ? `Abrir: ${firstLinkedContact.name || 'Contato'}`
-                                                                : 'Sem contatos vinculados'
+                                                                ? t('actions.openContactTitle', { name: firstLinkedContact.name || t('fallbacks.unnamedContact') })
+                                                                : t('actions.noLinkedContacts')
                                                         }
                                                     >
                                                         <Building2 size={18} />
@@ -411,7 +479,7 @@ export const ContactsList: React.FC<ContactsListProps> = ({
                                                     type="button"
                                                     onClick={() => onCompanyClick?.(company.id)}
                                                     className="font-semibold text-slate-900 dark:text-white block hover:text-primary-600 dark:hover:text-primary-400 transition-colors text-left"
-                                                    title={`Ver contatos de ${company.name}`}
+                                                    title={t('actions.viewCompanyContacts', { name: company.name })}
                                                 >
                                                     {company.name}
                                                 </button>
@@ -425,12 +493,12 @@ export const ContactsList: React.FC<ContactsListProps> = ({
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className="px-2 py-1 rounded bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 text-xs font-medium">
-                                            {company.industry || 'Indefinido'}
+                                            {company.industry || t('fallbacks.undefinedIndustry')}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className="text-slate-600 dark:text-slate-400 text-xs">
-                                            {PT_BR_DATE_FORMATTER.format(new Date(company.createdAt))}
+                                            {dateFormatter.format(new Date(company.createdAt))}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
@@ -445,14 +513,14 @@ export const ContactsList: React.FC<ContactsListProps> = ({
                                                     type="button"
                                                     onClick={() => openEditModal(c)}
                                                     className="h-6 w-6 rounded-full ring-2 ring-white dark:ring-dark-card bg-primary-100 dark:bg-primary-900 flex items-center justify-center text-[10px] font-bold text-primary-700 dark:text-primary-300 hover:bg-primary-200 dark:hover:bg-primary-800 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-dark-card"
-                                                    title={c.name || 'Sem nome'}
-                                                    aria-label={`Editar contato: ${c.name || 'Sem nome'}`}
+                                                    title={c.name || t('fallbacks.unnamedContact')}
+                                                    aria-label={t('actions.editContactAvatar', { name: c.name || t('fallbacks.unnamedContact') })}
                                                 >
                                                     {(c.name || '?').charAt(0)}
                                                 </button>
                                             ))}
                                             {(contactsByCompanyId.get(company.id) ?? []).length === 0 && (
-                                                <span className="text-slate-400 text-xs italic">Ninguém</span>
+                                                <span className="text-slate-400 text-xs italic">{t('fallbacks.nobody')}</span>
                                             )}
                                         </div>
                                     </td>
@@ -461,14 +529,14 @@ export const ContactsList: React.FC<ContactsListProps> = ({
                                             <button
                                                 onClick={() => openEditCompanyModal?.(company)}
                                                 className="p-1.5 text-slate-400 hover:text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded transition-colors"
-                                                aria-label={`Editar ${company.name}`}
+                                                aria-label={t('actions.edit', { name: company.name })}
                                             >
                                                 <Pencil size={16} aria-hidden="true" />
                                             </button>
                                             <button
                                                 onClick={() => setDeleteCompanyId?.(company.id)}
                                                 className="p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded text-slate-400 hover:text-red-500 transition-colors"
-                                                aria-label={`Excluir ${company.name}`}
+                                                aria-label={t('actions.delete', { name: company.name })}
                                             >
                                                 <Trash2 size={16} aria-hidden="true" />
                                             </button>

@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { AlertTriangle, TrendingUp, UserX, ArrowRight, Sparkles, Target } from 'lucide-react';
 import type { Activity } from '@/types';
 import type { AISuggestion } from '../hooks/useInboxController';
@@ -68,6 +69,7 @@ const SuggestionMiniRow: React.FC<{
   onAccept: () => void;
 }> = ({ suggestion, onAccept }) => {
   const router = useRouter();
+  const t = useTranslations('inbox.overview.actions');
 
   const icon = useMemo(() => {
     switch (suggestion.type) {
@@ -102,14 +104,14 @@ const SuggestionMiniRow: React.FC<{
           onClick={onAccept}
           className="px-2.5 py-1.5 rounded-md text-xs font-semibold bg-green-600 text-white hover:bg-green-700 transition-colors"
         >
-          Aplicar
+          {t('apply')}
         </button>
         <button
           onClick={() => navigationTarget && router.push(navigationTarget)}
           disabled={!navigationTarget}
           className="px-2.5 py-1.5 rounded-md text-xs font-semibold border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors disabled:opacity-50"
         >
-          Abrir
+          {t('open')}
         </button>
       </div>
     </div>
@@ -162,6 +164,7 @@ export const InboxOverviewView: React.FC<InboxOverviewViewProps> = ({
   onOpenCriticalSuggestions,
   onOpenPending,
 }) => {
+  const t = useTranslations('inbox.overview');
   const todayTotal = todayMeetings.length + todayTasks.length;
   const totalPending = overdueActivities.length + todayTotal + aiSuggestions.length;
 
@@ -187,9 +190,9 @@ export const InboxOverviewView: React.FC<InboxOverviewViewProps> = ({
       {/* Top CTA */}
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white">Visão Geral</h2>
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('title')}</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Diagnóstico rápido do dia (sem virar outra lista de atividades).
+            {t('subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -197,17 +200,17 @@ export const InboxOverviewView: React.FC<InboxOverviewViewProps> = ({
             onClick={onGoToList}
             className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
           >
-            Ver lista
+            {t('viewList')}
             <ArrowRight size={16} aria-hidden="true" />
           </button>
           <button
             onClick={onStartFocus}
             disabled={!canStartFocus}
             className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-primary-600 text-white text-sm font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50"
-            title={canStartFocus ? 'Começar a executar' : 'Nada pendente'}
+            title={canStartFocus ? t('startFocus') : t('nothingPending')}
           >
             <Target size={16} aria-hidden="true" />
-            Começar foco
+            {t('startFocus')}
           </button>
         </div>
       </div>
@@ -215,31 +218,31 @@ export const InboxOverviewView: React.FC<InboxOverviewViewProps> = ({
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard
-          label="Atrasados"
+          label={t('cards.overdue.label')}
           value={overdueActivities.length}
           tone={overdueActivities.length > 0 ? 'danger' : 'success'}
-          hint={overdueActivities.length > 0 ? 'Prioridade máxima' : 'Tudo em dia'}
+          hint={overdueActivities.length > 0 ? t('cards.overdue.priority') : t('cards.overdue.empty')}
           onClick={onOpenOverdue}
         />
         <StatCard
-          label="Hoje"
+          label={t('cards.today.label')}
           value={todayTotal}
           tone={todayTotal > 0 ? 'warning' : 'success'}
-          hint={todayTotal > 0 ? `${todayMeetings.length} reuniões • ${todayTasks.length} tarefas` : 'Sem tarefas para hoje'}
+          hint={todayTotal > 0 ? t('cards.today.withCounts', { meetings: todayMeetings.length, tasks: todayTasks.length }) : t('cards.today.empty')}
           onClick={onOpenToday}
         />
         <StatCard
-          label="Sugestões críticas"
+          label={t('cards.critical.label')}
           value={highPrioritySuggestions.length}
           tone={highPrioritySuggestions.length > 0 ? 'warning' : 'neutral'}
-          hint={highPrioritySuggestions.length > 0 ? 'Risco/Oportunidade agora' : 'Sem urgências'}
+          hint={highPrioritySuggestions.length > 0 ? t('cards.critical.withItems') : t('cards.critical.empty')}
           onClick={onOpenCriticalSuggestions}
         />
         <StatCard
-          label="Pendências"
+          label={t('cards.pending.label')}
           value={totalPending}
           tone={totalPending > 0 ? 'neutral' : 'success'}
-          hint={upcomingActivities.length > 0 ? `${upcomingActivities.length} próximos` : 'Backlog leve'}
+          hint={upcomingActivities.length > 0 ? t('cards.pending.withUpcoming', { count: upcomingActivities.length }) : t('cards.pending.empty')}
           onClick={onOpenPending}
         />
       </div>
@@ -250,17 +253,17 @@ export const InboxOverviewView: React.FC<InboxOverviewViewProps> = ({
           <div className="flex items-center justify-between gap-3 mb-3">
             <div className="flex items-center gap-2">
               <AlertTriangle size={16} className="text-orange-600 dark:text-orange-400" aria-hidden="true" />
-              <h3 className="font-bold text-slate-900 dark:text-white">Risco (resgate e deals parados)</h3>
+              <h3 className="font-bold text-slate-900 dark:text-white">{t('riskTitle')}</h3>
             </div>
             <button
               onClick={onGoToList}
               className="text-sm font-semibold text-primary-600 dark:text-primary-400 hover:underline"
             >
-              Ver tudo
+              {t('viewAll')}
             </button>
           </div>
           {riskSuggestions.length === 0 ? (
-            <div className="text-sm text-slate-500 dark:text-slate-400">Sem riscos destacados agora.</div>
+            <div className="text-sm text-slate-500 dark:text-slate-400">{t('noRisks')}</div>
           ) : (
             <div className="space-y-1">
               {riskSuggestions.map(s => (
@@ -278,17 +281,17 @@ export const InboxOverviewView: React.FC<InboxOverviewViewProps> = ({
           <div className="flex items-center justify-between gap-3 mb-3">
             <div className="flex items-center gap-2">
               <TrendingUp size={16} className="text-green-600 dark:text-green-400" aria-hidden="true" />
-              <h3 className="font-bold text-slate-900 dark:text-white">Oportunidades (upsell)</h3>
+              <h3 className="font-bold text-slate-900 dark:text-white">{t('opportunitiesTitle')}</h3>
             </div>
             <button
               onClick={onGoToList}
               className="text-sm font-semibold text-primary-600 dark:text-primary-400 hover:underline"
             >
-              Ver tudo
+              {t('viewAll')}
             </button>
           </div>
           {opportunitySuggestions.length === 0 ? (
-            <div className="text-sm text-slate-500 dark:text-slate-400">Sem oportunidades destacadas agora.</div>
+            <div className="text-sm text-slate-500 dark:text-slate-400">{t('noOpportunities')}</div>
           ) : (
             <div className="space-y-1">
               {opportunitySuggestions.map(s => (

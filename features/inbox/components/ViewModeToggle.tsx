@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { LayoutDashboard, List, Target } from 'lucide-react';
 import { ViewMode } from '../hooks/useInboxController';
 
@@ -14,8 +15,10 @@ interface ViewModeToggleProps {
  * @returns {Element} Retorna um valor do tipo `Element`.
  */
 export const ViewModeToggle: React.FC<ViewModeToggleProps> = ({ mode, onChange }) => {
+  const t = useTranslations('inbox.viewMode');
+
   return (
-    <div className="inline-flex items-center bg-slate-100 dark:bg-white/5 rounded-lg p-1 border border-slate-200 dark:border-white/10" role="group" aria-label="Modo de visualização">
+    <div className="inline-flex items-center bg-slate-100 dark:bg-white/5 rounded-lg p-1 border border-slate-200 dark:border-white/10" role="group" aria-label={t('ariaLabel')}>
       <button
         onClick={() => onChange('overview')}
         aria-pressed={mode === 'overview'}
@@ -25,7 +28,7 @@ export const ViewModeToggle: React.FC<ViewModeToggleProps> = ({ mode, onChange }
           }`}
       >
         <LayoutDashboard size={16} aria-hidden="true" />
-        Visão Geral
+        {t('overview')}
       </button>
       <button
         onClick={() => onChange('list')}
@@ -36,7 +39,7 @@ export const ViewModeToggle: React.FC<ViewModeToggleProps> = ({ mode, onChange }
           }`}
       >
         <List size={16} aria-hidden="true" />
-        Lista
+        {t('list')}
       </button>
       <button
         onClick={() => onChange('focus')}
@@ -47,7 +50,7 @@ export const ViewModeToggle: React.FC<ViewModeToggleProps> = ({ mode, onChange }
           }`}
       >
         <Target size={16} aria-hidden="true" />
-        Foco
+        {t('focus')}
       </button>
     </div>
   );

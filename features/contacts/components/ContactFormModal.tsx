@@ -1,5 +1,6 @@
 import React, { useId, useState } from 'react';
 import { X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Contact } from '@/types';
 import { DebugFillButton } from '@/components/debug/DebugFillButton';
 import { fakeContact } from '@/lib/debug';
@@ -56,6 +57,7 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
   isSubmitting = false,
 }) => {
   const headingId = useId();
+  const t = useTranslations('contacts.contactForm');
   useFocusReturn({ enabled: isOpen });
   const [isCreatingBatch, setIsCreatingBatch] = useState(false);
   
@@ -89,7 +91,7 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
           <div className="p-5 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
             <div className="flex items-center gap-2">
               <h2 id={headingId} className="text-lg font-bold text-slate-900 dark:text-white font-display">
-                {editingContact ? 'Editar Contato' : 'Novo Contato'}
+                {editingContact ? t('editTitle') : t('createTitle')}
               </h2>
               <DebugFillButton onClick={fillWithFakeData} />
               {createFakeContactsBatch && (
@@ -103,7 +105,7 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
                       setIsCreatingBatch(false);
                     }
                   }}
-                  label={isCreatingBatch ? 'Criando...' : 'Fake x10'}
+                  label={isCreatingBatch ? t('creatingBatch') : t('fakeBatch')}
                   variant="secondary"
                   className="ml-1"
                   disabled={isCreatingBatch}
@@ -112,7 +114,7 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
             </div>
             <button
               onClick={onClose}
-              aria-label="Fechar modal"
+              aria-label={t('closeAriaLabel')}
               className="text-slate-400 hover:text-slate-600 dark:hover:text-white focus-visible-ring rounded"
             >
               <X size={20} aria-hidden="true" />
@@ -121,24 +123,24 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
         <form onSubmit={onSubmit} className="p-5 space-y-4">
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-              Nome Completo
+              {t('fullName')}
             </label>
             <input
               required
               type="text"
               className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500"
-              placeholder="Ex: Ana Souza"
+              placeholder={t('fullNamePlaceholder')}
               value={formData.name}
               onChange={e => setFormData({ ...formData, name: e.target.value })}
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Email</label>
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{t('email')}</label>
             <input
               required
               type="email"
               className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500"
-              placeholder="ana@empresa.com"
+              placeholder={t('emailPlaceholder')}
               value={formData.email}
               onChange={e => setFormData({ ...formData, email: e.target.value })}
             />
@@ -146,22 +148,22 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-                Telefone
+                {t('phone')}
               </label>
               <input
                 type="text"
                 className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500"
-                placeholder="+5511999999999"
+                placeholder={t('phonePlaceholder')}
                 value={formData.phone}
                 onChange={e => setFormData({ ...formData, phone: e.target.value })}
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Cargo</label>
+              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{t('role')}</label>
               <input
                 type="text"
                 className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500"
-                placeholder="Gerente"
+                placeholder={t('rolePlaceholder')}
                 value={formData.role}
                 onChange={e => setFormData({ ...formData, role: e.target.value })}
               />
@@ -169,24 +171,24 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-              Empresa
+              {t('company')}
             </label>
             <input
               type="text"
               className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500"
-              placeholder="Nome da Empresa"
+              placeholder={t('companyPlaceholder')}
               value={formData.companyName}
               onChange={e => setFormData({ ...formData, companyName: e.target.value })}
             />
             <p className="text-[10px] text-slate-400 mt-1">
               {editingContact
-                ? 'Edite para alterar a empresa. Deixe em branco para desvincular.'
-                : 'Se a empresa já existir, o contato será vinculado a ela.'}
+                ? t('companyHintEdit')
+                : t('companyHintCreate')}
             </p>
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-              Tags
+              {t('tags')}
             </label>
             <div className="flex flex-wrap gap-1.5 mb-2">
               {(formData.tags || []).map((tag, idx) => (
@@ -199,7 +201,7 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
                     type="button"
                     onClick={() => setFormData({ ...formData, tags: formData.tags.filter((_, i) => i !== idx) })}
                     className="hover:text-red-500 transition-colors"
-                    aria-label={`Remover tag ${tag}`}
+                    aria-label={t('removeTag', { tag })}
                   >
                     <X size={12} />
                   </button>
@@ -209,7 +211,7 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
             <input
               type="text"
               className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500"
-              placeholder="Digite e pressione Enter"
+              placeholder={t('tagsPlaceholder')}
               onKeyDown={e => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
@@ -228,7 +230,7 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
               disabled={isSubmitting}
             className="w-full bg-primary-600 hover:bg-primary-500 text-white font-bold py-2.5 rounded-lg mt-2 shadow-lg shadow-primary-600/20 transition-all"
           >
-            {isSubmitting ? 'Criando...' : (editingContact ? 'Salvar Alterações' : 'Criar Contato')}
+            {isSubmitting ? t('creating') : (editingContact ? t('save') : t('create'))}
           </button>
         </form>
         </div>

@@ -1,4 +1,5 @@
 import React, { useId } from 'react';
+import { useTranslations } from 'next-intl';
 import { X, LayoutGrid } from 'lucide-react';
 import { Board } from '@/types';
 import { FocusTrap, useFocusReturn } from '@/lib/a11y';
@@ -36,6 +37,7 @@ export const SelectBoardModal: React.FC<SelectBoardModalProps> = ({
   boards,
   contactName,
 }) => {
+  const t = useTranslations('contacts.selectBoardModal');
   const headingId = useId();
   const descriptionId = useId();
   useFocusReturn({ enabled: isOpen });
@@ -60,15 +62,15 @@ export const SelectBoardModal: React.FC<SelectBoardModalProps> = ({
           <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-white/10">
             <div>
               <h2 id={headingId} className="text-xl font-bold text-slate-900 dark:text-white">
-                Criar Deal
+                {t('title')}
               </h2>
               <p id={descriptionId} className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                Selecione o board para <strong>{contactName}</strong>
+                {t.rich('description', { contactName, strong: (chunks) => <strong>{chunks}</strong> })}
               </p>
             </div>
             <button
               onClick={onClose}
-              aria-label="Fechar modal"
+              aria-label={t('closeAriaLabel')}
               className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors focus-visible-ring"
             >
               <X size={20} className="text-slate-500" aria-hidden="true" />
@@ -97,7 +99,7 @@ export const SelectBoardModal: React.FC<SelectBoardModalProps> = ({
                     </p>
                   )}
                   <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
-                    {board.stages?.length || 0} estágios
+                    {t('stages', { count: board.stages?.length || 0 })}
                   </p>
                 </div>
               </button>
@@ -108,7 +110,7 @@ export const SelectBoardModal: React.FC<SelectBoardModalProps> = ({
         {/* Footer */}
         <div className="p-4 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5">
           <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
-            O deal será criado no primeiro estágio do board selecionado
+            {t('footer')}
           </p>
         </div>
         </div>

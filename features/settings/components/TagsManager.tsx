@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tag, Plus, X } from 'lucide-react';
 import { SettingsSection } from './SettingsSection';
+import { useTranslations } from 'next-intl';
 
 interface TagsManagerProps {
   availableTags: string[];
@@ -35,22 +36,23 @@ export const TagsManager: React.FC<TagsManagerProps> = ({
   onAddTag,
   onRemoveTag
 }) => {
+  const t = useTranslations('settings.tags');
   return (
-    <SettingsSection title="Gerenciamento de Tags" icon={Tag}>
+    <SettingsSection title={t('title')} icon={Tag}>
       <p className="text-sm text-slate-600 dark:text-slate-300 mb-4 leading-relaxed">
-        Crie tags para categorizar seus negócios. Elas aparecerão como opções ao criar ou editar negócios no Pipeline.
+        {t('description')}
       </p>
 
       <div className="p-4 rounded-xl border bg-slate-50 dark:bg-black/20 border-slate-200 dark:border-white/5 mb-6">
         <div className="flex gap-3 items-end">
           <div className="flex-1">
-            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Nome da Tag</label>
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{t('nameLabel')}</label>
             <input
               type="text"
               value={newTagName}
               onChange={(e) => setNewTagName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && onAddTag()}
-              placeholder="Ex: VIP, Urgente, Q4..."
+              placeholder={t('namePlaceholder')}
               className="w-full bg-white dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500 dark:text-white"
             />
           </div>
@@ -59,7 +61,7 @@ export const TagsManager: React.FC<TagsManagerProps> = ({
             disabled={!newTagName.trim()}
             className="bg-primary-600 hover:bg-primary-500 shadow-primary-600/20 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors h-[38px] shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Plus size={16} /> Adicionar
+            <Plus size={16} /> {t('add')}
           </button>
         </div>
       </div>
@@ -72,14 +74,14 @@ export const TagsManager: React.FC<TagsManagerProps> = ({
             <button
               onClick={() => onRemoveTag(tag)}
               className="text-slate-400 hover:text-red-500 p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors opacity-0 group-hover:opacity-100"
-              title="Remover tag"
+              title={t('removeTag')}
             >
               <X size={14} />
             </button>
           </div>
         ))}
         {availableTags.length === 0 && (
-          <p className="text-center text-slate-500 text-sm py-4 italic w-full">Nenhuma tag criada.</p>
+          <p className="text-center text-slate-500 text-sm py-4 italic w-full">{t('empty')}</p>
         )}
       </div>
     </SettingsSection>

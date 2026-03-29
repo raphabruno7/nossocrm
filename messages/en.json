@@ -65,5 +65,978 @@
   "language": {
     "toggle": "PT",
     "current": "EN"
+  },
+  "common": {
+    "confirmModal": {
+      "cancel": "Cancel",
+      "confirm": "Confirm"
+    },
+    "periodFilter": {
+      "ariaLabel": "Select period",
+      "all": "All Time",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "last_7_days": "Last 7 Days",
+      "last_30_days": "Last 30 Days",
+      "this_month": "This Month",
+      "last_month": "Last Month",
+      "this_quarter": "This Quarter",
+      "last_quarter": "Last Quarter",
+      "this_year": "This Year",
+      "last_year": "Last Year",
+      "comparison": {
+        "all": "total",
+        "today": "vs yesterday",
+        "yesterday": "vs two days ago",
+        "last_7_days": "vs previous 7 days",
+        "last_30_days": "vs previous 30 days",
+        "this_month": "vs last month",
+        "last_month": "vs previous month",
+        "this_quarter": "vs last quarter",
+        "last_quarter": "vs previous quarter",
+        "this_year": "vs last year",
+        "last_year": "vs previous year"
+      }
+    }
+  },
+  "boards": {
+    "onboarding": {
+      "skipAriaLabel": "Skip welcome onboarding",
+      "title": "Welcome to your CRM! 👋",
+      "description": "Let's create your <strong>first custom board</strong> in less than 30 seconds?",
+      "featuresAriaLabel": "CRM features",
+      "cards": {
+        "templates": {
+          "title": "Ready-Made Templates",
+          "description": "Sales, onboarding, CS and more"
+        },
+        "ai": {
+          "title": "AI Creation",
+          "description": "Describe your business in 1 sentence"
+        },
+        "fast": {
+          "title": "Super Fast",
+          "description": "Less than 30 seconds"
+        }
+      },
+      "start": "Start now",
+      "explore": "Explore on your own",
+      "footnote": "You can create as many boards as you want later 😊"
+    },
+    "createDealModal": {
+      "title": "New Deal",
+      "dealName": "Deal Name",
+      "dealNamePlaceholder": "Ex: Annual Contract - Acme",
+      "estimatedValue": "Estimated Value ($)",
+      "company": "Company",
+      "companyPlaceholder": "Company Ltd",
+      "primaryContact": "Primary Contact",
+      "contactName": "Contact Name",
+      "contactNamePlaceholder": "Contact Name",
+      "email": "Email",
+      "emailPlaceholder": "email@example.com",
+      "submit": "Create Deal"
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Overview",
+      "subtitle": "Your business pulse in real time.",
+      "selectBoardAriaLabel": "Select sales pipeline",
+      "pipelineAlerts": "Pipeline alerts",
+      "pipelineTotal": "Total Pipeline",
+      "activeDeals": "Active Deals",
+      "conversion": "Conversion",
+      "wonRevenue": "Won Revenue",
+      "walletHealth": "Portfolio Health",
+      "portfolioDistribution": "Portfolio Distribution",
+      "active": "Active",
+      "inactive": "Inactive",
+      "churn": "Churn",
+      "stagnantDeals": "Stalled Deals",
+      "dealsCount": "{count} deals",
+      "attention": "Attention",
+      "ok": "OK",
+      "stagnantDescription": "No stage changes for 10+ days.",
+      "atRisk": "{value} at risk",
+      "avgLtv": "Average LTV",
+      "average": "Average",
+      "avgLtvDescription": "Average lifetime value per active customer.",
+      "funnel": "Funnel",
+      "recentActivities": "Recent Activities",
+      "noRecentActivities": "No recent activity.",
+      "viewAllActivities": "View all activities"
+    },
+    "activityFeed": {
+      "inDeal": "in"
+    },
+    "pipelineAlertsModal": {
+      "title": "Pipeline Alerts",
+      "needsAttention": "{count} items need attention",
+      "healthy": "Your pipeline looks healthy! 🎉",
+      "closeAriaLabel": "Close",
+      "stagnant": {
+        "title": "Stagnant Deals",
+        "description": "No stage changes for more than 10 days"
+      },
+      "noActivity": {
+        "title": "No Next Step",
+        "description": "No future activity scheduled"
+      },
+      "readyToClose": {
+        "title": "Ready to Close",
+        "description": "High probability of conversion"
+      },
+      "dealProbability": "{value} • {probability}% probability",
+      "otherDeals": "+ {count} other deals",
+      "noDeals": "No deals in this category ✓",
+      "tip": "💡 Tip: Deals without future activity are less likely to convert. Schedule next steps!"
+    }
+  },
+  "reports": {
+    "page": {
+      "title": "Performance Reports",
+      "subtitle": "Detailed sales analysis and trends.",
+      "generatedByFallback": "User",
+      "selectPipelineAriaLabel": "Select pipeline",
+      "exportPdfTitle": "Export PDF",
+      "realized": "Actual",
+      "goal": "Goal",
+      "gap": "Gap",
+      "achieved": "✓ Achieved",
+      "onTrack": "🎯 On track! {amount} left to hit the goal.",
+      "offTrack": "⚠️ Attention! You're below 75% of the goal. {amount} left.",
+      "goalNotConfigured": "Goal not configured",
+      "goalNotConfiguredDescription": "Set a board goal to track the forecast.",
+      "configure": "Configure",
+      "pipelineTotal": "Total Pipeline",
+      "winRate": "Win Rate",
+      "avgCycle": "Average Cycle",
+      "avgCycleValue": "{count} days",
+      "fastSlow": "Fast: {fast}d | Slow: {slow}d",
+      "closedDeals": "Closed Deals",
+      "closedVolume": "Closed Volume",
+      "winsLosses": "Wins / Losses",
+      "revenueTrend": "Revenue Trend",
+      "lastSixMonths": "Last 6 Months",
+      "topSellers": "Top Sellers",
+      "dealsCount": "{count} deals",
+      "noClosedDeals": "No deals closed in the selected period.",
+      "pdf": {
+        "title": "Performance Report",
+        "pipelinePrefix": "Pipeline",
+        "defaultBoardName": "Default",
+        "generatedByPrefix": "By",
+        "timeConnector": "at",
+        "fallbackUser": "User",
+        "min": "Min",
+        "days": "days",
+        "deals": "deals",
+        "funnelTitle": "Sales Funnel",
+        "noOwner": "Unassigned",
+        "noDataInPeriod": "No data in the selected period",
+        "footerPage": "Page",
+        "table": {
+          "rank": "#",
+          "seller": "Seller",
+          "deals": "Deals",
+          "revenue": "Revenue"
+        }
+      }
+    }
+  },
+  "inbox": {
+    "page": {
+      "subtitle": "Your work desk.",
+      "seedButton": "Seed Inbox"
+    },
+    "viewMode": {
+      "ariaLabel": "View mode",
+      "overview": "Overview",
+      "list": "List",
+      "focus": "Focus"
+    },
+    "overview": {
+      "title": "Overview",
+      "subtitle": "Quick diagnosis for the day without turning into another task list.",
+      "viewList": "View list",
+      "startFocus": "Start focus",
+      "nothingPending": "Nothing pending",
+      "cards": {
+        "overdue": {
+          "label": "Overdue",
+          "priority": "Top priority",
+          "empty": "Everything on track"
+        },
+        "today": {
+          "label": "Today",
+          "withCounts": "{meetings} meetings • {tasks} tasks",
+          "empty": "No tasks for today"
+        },
+        "critical": {
+          "label": "Critical suggestions",
+          "withItems": "Risk/opportunity right now",
+          "empty": "No urgent items"
+        },
+        "pending": {
+          "label": "Pending",
+          "withUpcoming": "{count} upcoming",
+          "empty": "Light backlog"
+        }
+      },
+      "riskTitle": "Risk (rescue and stalled deals)",
+      "opportunitiesTitle": "Opportunities (upsell)",
+      "viewAll": "View all",
+      "noRisks": "No highlighted risks right now.",
+      "noOpportunities": "No highlighted opportunities right now.",
+      "actions": {
+        "apply": "Apply",
+        "open": "Open"
+      }
+    }
+  },
+  "contacts": {
+    "header": {
+      "peopleTitle": "People (Contacts)",
+      "companiesTitle": "Companies (Accounts)",
+      "peopleSubtitle": "People you do business with.",
+      "companiesSubtitle": "Organizations where your contacts work.",
+      "statusFilterAriaLabel": "Filter by status",
+      "status": {
+        "all": "All Statuses",
+        "active": "Active",
+        "inactive": "Inactive",
+        "churned": "Lost (Churn)",
+        "risk": "At Risk (Alert)"
+      },
+      "companyFilterAriaLabel": "Filter by company/category",
+      "allCategories": "All Categories",
+      "tagFilterAriaLabel": "Filter by tag",
+      "allTags": "All Tags",
+      "searchPeoplePlaceholder": "Search names, emails...",
+      "searchCompaniesPlaceholder": "Search companies, industry...",
+      "closeAdvancedFiltersAriaLabel": "Close advanced filters",
+      "openAdvancedFiltersAriaLabel": "Open advanced filters",
+      "importExportAriaLabel": "Import/export contacts",
+      "newContact": "New Contact",
+      "newCompany": "New Company"
+    },
+    "tabs": {
+      "people": "People",
+      "companies": "Companies"
+    },
+    "stageTabs": {
+      "all": "All",
+      "lead": "Leads",
+      "mql": "MQL",
+      "prospect": "Prospects",
+      "customer": "Customers",
+      "other": "Other / Lost"
+    },
+    "filters": {
+      "createdStart": "Created Date (Start)",
+      "createdEnd": "Created Date (End)",
+      "clear": "Clear Filters"
+    },
+    "selectBoardModal": {
+      "title": "Create Deal",
+      "description": "Select the board for <strong>{contactName}</strong>",
+      "closeAriaLabel": "Close modal",
+      "stages": "{count} stages",
+      "footer": "The deal will be created in the first stage of the selected board"
+    },
+    "pagination": {
+      "showing": "Showing {from}-{to} of {total} contacts",
+      "itemsPerPage": "Items per page",
+      "selectItemsPerPageAriaLabel": "Select items per page",
+      "perPageOption": "{size} per page",
+      "goTo": "Go to:",
+      "goToSpecificPageAriaLabel": "Go to a specific page",
+      "pageOf": "Page {page} of {total}",
+      "firstPageAriaLabel": "Go to first page",
+      "firstPageTitle": "First page",
+      "previousPageAriaLabel": "Go to previous page",
+      "previousPageTitle": "Previous page",
+      "nextPageAriaLabel": "Go to next page",
+      "nextPageTitle": "Next page",
+      "lastPageAriaLabel": "Go to last page",
+      "lastPageTitle": "Last page",
+      "loadingAriaLabel": "Loading",
+      "loading": "Loading..."
+    },
+    "contactForm": {
+      "createTitle": "New Contact",
+      "editTitle": "Edit Contact",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "Ex: Ana Souza",
+      "email": "Email",
+      "emailPlaceholder": "ana@company.com",
+      "phone": "Phone",
+      "phonePlaceholder": "+5511999999999",
+      "phoneHint": "E.164 format (ex.: +5511999999999)",
+      "role": "Role",
+      "rolePlaceholder": "Manager",
+      "company": "Company",
+      "companyPlaceholder": "Company Name",
+      "companyHintEdit": "Edit to change the company. Leave blank to unlink.",
+      "companyHintCreate": "If the company already exists, the contact will be linked to it.",
+      "closeAriaLabel": "Close modal",
+      "tags": "Tags",
+      "removeTag": "Remove tag {tag}",
+      "tagsPlaceholder": "Type and press Enter",
+      "creating": "Creating...",
+      "creatingBatch": "Creating...",
+      "fakeBatch": "Fake x10",
+      "save": "Save Changes",
+      "create": "Create Contact"
+    },
+    "companyForm": {
+      "createTitle": "New Company",
+      "editTitle": "Edit Company",
+      "name": "Name",
+      "namePlaceholder": "Ex: Arcus CRM LTD",
+      "industry": "Industry",
+      "industryPlaceholder": "Ex: SaaS",
+      "website": "Website",
+      "websitePlaceholder": "company.com",
+      "websiteHint": "Without http(s) (we normalize it automatically).",
+      "save": "Save Changes",
+      "create": "Create Company"
+    },
+    "page": {
+      "bulkActions": {
+        "selectedPeople": "{count, plural, one {# contact selected} other {# contacts selected}}",
+        "selectedCompanies": "{count, plural, one {# company selected} other {# companies selected}}",
+        "clearSelection": "Clear selection",
+        "deleteSelected": "Delete selected"
+      },
+      "deleteContact": {
+        "title": "Delete Contact",
+        "message": "Are you sure you want to delete this contact? This action cannot be undone.",
+        "confirm": "Delete"
+      },
+      "deleteCompany": {
+        "title": "Delete Company",
+        "message": "Are you sure you want to delete this company? This action cannot be undone.",
+        "confirm": "Delete"
+      },
+      "deleteWithDeals": {
+        "title": "Contact With Deals",
+        "intro": "This contact has {count, plural, one {# linked deal} other {# linked deals}}:",
+        "warning": "Deleting it will also delete all linked deals.",
+        "confirm": "Delete All"
+      },
+      "bulkDelete": {
+        "titlePeople": "Bulk Delete Contacts",
+        "titleCompanies": "Bulk Delete Companies",
+        "messagePrefix": "Are you sure you want to delete",
+        "peopleNoun": "{count, plural, one {contact} other {contacts}}",
+        "companiesNoun": "{count, plural, one {company} other {companies}}",
+        "warningPeople": "All linked deals will also be deleted. This action cannot be undone.",
+        "warningCompanies": "Linked contacts/deals will be unlinked from the company before deletion. This action cannot be undone.",
+        "confirmPeople": "Delete {count, plural, one {# contact} other {# contacts}}",
+        "confirmCompanies": "Delete {count, plural, one {# company} other {# companies}}"
+      }
+    },
+    "list": {
+      "relativeDate": {
+        "none": "---",
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "daysAgo": "{count} days ago",
+        "weeksAgo": "{count} wk ago"
+      },
+      "sortBy": "Sort by {label}",
+      "headers": {
+        "name": "Name",
+        "stage": "Stage",
+        "roleCompany": "Role / Company",
+        "contact": "Contact",
+        "status": "Status",
+        "created": "Created",
+        "modified": "Modified",
+        "actions": "Actions",
+        "company": "Company",
+        "industry": "Industry",
+        "createdAt": "Created on",
+        "linkedPeople": "Linked People"
+      },
+      "selection": {
+        "allContacts": "Select all contacts",
+        "allCompanies": "Select all companies",
+        "contact": "Select {name}",
+        "company": "Select {name}"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "lost": "Lost"
+      },
+      "actions": {
+        "editContactAvatar": "Edit contact: {name}",
+        "changeStatus": "Change {name} status from {status}",
+        "createOpportunity": "Create opportunity for {name}",
+        "edit": "Edit {name}",
+        "delete": "Delete {name}",
+        "openLinkedContact": "Open linked contact for {name}",
+        "noLinkedContactsFor": "No linked contacts for {name}",
+        "openContactTitle": "Open: {name}",
+        "noLinkedContacts": "No linked contacts",
+        "viewCompanyContacts": "View contacts from {name}"
+      },
+      "fallbacks": {
+        "unnamedContact": "Unnamed",
+        "roleNotInformed": "Role not informed",
+        "undefinedIndustry": "Undefined",
+        "nobody": "No one",
+        "unlinkedCompany": "No linked company"
+      }
+    },
+    "importExport": {
+      "title": "Import / Export Contacts",
+      "tabs": {
+        "export": "Export",
+        "import": "Import CSV"
+      },
+      "delimiter": {
+        "label": "Delimiter",
+        "auto": "Auto",
+        "comma": ", (comma)",
+        "semicolon": "; (semicolon)",
+        "tab": "TAB"
+      },
+      "export": {
+        "title": "Export contacts (CSV)",
+        "description": "Market standard: export the list respecting current filters/search/sorting.",
+        "fields": "Exported fields:",
+        "button": "Export CSV",
+        "loading": "Generating...",
+        "defaultFilename": "contacts.csv"
+      },
+      "import": {
+        "title": "Import contacts (CSV)",
+        "description": "Market standard: upload → validation → dedupe (by email) → summary + error report.",
+        "downloadTemplate": "Download template",
+        "templateFilename": "contacts-template.csv",
+        "errorReportFilename": "contacts-import-errors.csv",
+        "fileLabel": "CSV file",
+        "duplicatesTitle": "Duplicates (match by email)",
+        "modes": {
+          "upsert": "Update if it already exists (recommended)",
+          "skip": "Skip rows with an existing email",
+          "create": "Always create (can duplicate)"
+        },
+        "createCompaniesLabel": "Create companies automatically from the {column} column",
+        "createCompaniesHelpEnabled": "When checked: if the CSV has the company name and it does not exist yet in the CRM, we create the company and link the contact.",
+        "createCompaniesHelpDisabled": "When unchecked: we do not create companies. If the company does not exist, the contact is imported without a company link.",
+        "button": "Import",
+        "loading": "Importing...",
+        "summary": "Summary:",
+        "summaryCounts": "{created} created • {updated} updated • {skipped} skipped • {errors} errors",
+        "downloadErrors": "Download error report (CSV)"
+      },
+      "toasts": {
+        "templateDownloaded": "CSV template downloaded.",
+        "exportStarted": "Export started.",
+        "selectFile": "Select a CSV file.",
+        "importCompleted": "Import completed: {created} created, {updated} updated, {skipped} skipped, {errors} errors."
+      },
+      "errors": {
+        "exportFailed": "Export failed (HTTP {status})",
+        "importFailed": "Import failed (HTTP {status})",
+        "exportDefault": "Error while exporting.",
+        "importDefault": "Error while importing."
+      }
+    },
+    "toast": {
+      "companyUpdated": "Company updated!",
+      "companyUpdateError": "Error updating company: {message}",
+      "creatingCompany": "Creating company...",
+      "companyCreated": "Company created!",
+      "companyCreateError": "Error creating company: {message}",
+      "deletingCompany": "Deleting company...",
+      "companyDeleted": "Company deleted successfully",
+      "companyDeleteError": "Error deleting company: {message}",
+      "contactDeleted": "Contact deleted successfully",
+      "deleteError": "Error deleting: {message}",
+      "checkDealsError": "Error checking contact deals",
+      "contactAndDealsDeleted": "Contact and {count, plural, one {# deal} other {# deals}} deleted",
+      "bulkDeletedPeople": "{count, plural, one {# contact deleted} other {# contacts deleted}}",
+      "bulkDeletedCompanies": "{count, plural, one {# company deleted} other {# companies deleted}}",
+      "bulkDeleteErrorPeople": "Failed to delete {count, plural, one {# contact} other {# contacts}}",
+      "bulkDeleteErrorCompanies": "Failed to delete {count, plural, one {# company} other {# companies}}",
+      "creatingContact": "Creating contact...",
+      "contactUpdated": "Contact updated!",
+      "contactCreated": "Contact created!",
+      "contactCreateError": "Error creating contact: {message}",
+      "fakeContactsCreated": "{count} fake contacts created!",
+      "noBoards": "No boards available. Create a board first.",
+      "contactNotFound": "Contact not found",
+      "boardWithoutStages": "Board has no configured stages",
+      "dealCreated": "Deal created on board \"{boardName}\"",
+      "dealCreateError": "Error creating deal: {message}",
+      "createDealError": "Error creating deal"
+    }
+  },
+  "activities": {
+    "page": {
+      "completedSelected": "{count, plural, one {# activity completed!} other {# activities completed!}}",
+      "snoozedSelected": "{count, plural, one {# activity snoozed to tomorrow!} other {# activities snoozed to tomorrow!}}"
+    },
+    "header": {
+      "title": "Activities",
+      "subtitle": "Manage your tasks and commitments",
+      "filterPrefix": "Filter",
+      "newActivity": "New Activity",
+      "filters": {
+        "overdue": "Overdue",
+        "today": "Today",
+        "upcoming": "Upcoming"
+      }
+    },
+    "filters": {
+      "searchPlaceholder": "Search activities...",
+      "allTypes": "All types",
+      "call": "Calls",
+      "meeting": "Meetings",
+      "email": "Emails",
+      "task": "Tasks"
+    },
+    "list": {
+      "empty": "No activities found"
+    },
+    "form": {
+      "createTitle": "New Activity",
+      "editTitle": "Edit Activity",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Ex: Call customer",
+      "typeLabel": "Type",
+      "dealLabel": "Related Deal",
+      "selectPlaceholder": "Select...",
+      "dateLabel": "Date",
+      "timeLabel": "Time",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Activity details...",
+      "closeAriaLabel": "Close modal",
+      "save": "Save Changes",
+      "create": "Create Activity",
+      "types": {
+        "call": "Call",
+        "meeting": "Meeting",
+        "email": "Email",
+        "task": "Task"
+      }
+    },
+    "row": {
+      "legacyStatuses": {
+        "new": "New Opportunities",
+        "contacted": "Contacted",
+        "proposal": "Proposal",
+        "negotiation": "Negotiation",
+        "closedWon": "Won",
+        "closedLost": "Lost",
+        "lead": "Lead",
+        "mql": "Qualified Lead",
+        "prospect": "Opportunity",
+        "customer": "Customer"
+      },
+      "stageNotIdentified": "Stage not identified",
+      "justNow": "just now",
+      "minutesAgo": "{count} min ago",
+      "hoursAgo": "{count} h ago",
+      "yesterday": "yesterday",
+      "movedTo": "Moved to",
+      "dealCreated": "Deal created",
+      "overdue": "OVERDUE",
+      "openContact": "Open contact: {name}",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "bulkActions": {
+      "selected": "{count, plural, one {# activity selected} other {# activities selected}}",
+      "complete": "Complete",
+      "snooze": "Snooze 1 Day",
+      "clearSelection": "Clear selection"
+    },
+    "calendar": {
+      "today": "Today",
+      "noLinkedDeal": "No linked deal"
+    },
+    "toast": {
+      "confirmDelete": "Are you sure you want to delete this activity?",
+      "deleted": "Activity deleted successfully",
+      "reopened": "Activity reopened",
+      "completed": "Activity completed",
+      "updated": "Activity updated successfully",
+      "created": "Activity created successfully",
+      "createError": "Error creating activity: {message}"
+    }
+  },
+  "settings": {
+    "page": {
+      "tabs": {
+        "general": "General",
+        "products": "Products/Services",
+        "integrations": "Integrations",
+        "ai": "AI Center",
+        "data": "Data",
+        "users": "Team"
+      },
+      "general": {
+        "title": "Home Page",
+        "subtitle": "Choose which screen should open when you start the CRM.",
+        "selectAriaLabel": "Select home page",
+        "routes": {
+          "dashboard": "Dashboard",
+          "inboxList": "Inbox (List)",
+          "inboxFocus": "Inbox (Focus)",
+          "boards": "Boards (Kanban)",
+          "contacts": "Contacts",
+          "activities": "Activities",
+          "reports": "Reports"
+        }
+      }
+    },
+    "aiCenter": {
+      "title": "AI Center",
+      "subtitle": "Configure the provider/model and manage the prompts used in the system.",
+      "enabledTitle": "AI enabled for the organization",
+      "enabledDescription": "When disabled, AI features become unavailable for the whole team.",
+      "adminOnly": "Only administrators can change this setting.",
+      "enabledAriaLabel": "Enable AI for the organization"
+    },
+    "users": {
+      "loading": "Loading team...",
+      "restricted": "Restricted Access",
+      "restrictedDescription": "Only administrators can manage team members.",
+      "title": "Your Team",
+      "invite": "Invite",
+      "you": "you",
+      "pending": "Pending",
+      "copyLink": "Copy link",
+      "revokeLink": "Revoke link",
+      "cancelInvite": "Cancel invite",
+      "back": "Back",
+      "adminRole": "Admin",
+      "vendedorRole": "Sales",
+      "memberCount": "{count} {noun}",
+      "member": "member",
+      "members": "members",
+      "modal": {
+        "title": "Invite to Team",
+        "emailLabel": "Email",
+        "emailPlaceholder": "colleague@company.com",
+        "roleLabel": "Role",
+        "roleAdmin": "Admin",
+        "roleVendedor": "Sales",
+        "submit": "Send Invite",
+        "sending": "Sending...",
+        "closeAriaLabel": "Close modal"
+      },
+      "toast": {
+        "inviteSent": "Invite sent to {email}",
+        "inviteError": "Error sending invite: {message}",
+        "linkCopied": "Link copied!",
+        "linkRevoked": "Link revoked",
+        "inviteCancelled": "Invite cancelled",
+        "error": "Error: {message}"
+      }
+    },
+    "tags": {
+      "title": "Tag Management",
+      "description": "Create tags to categorize your deals. They will appear as options when creating or editing deals in the Pipeline.",
+      "nameLabel": "Tag Name",
+      "namePlaceholder": "Ex: VIP, Urgent, Q4...",
+      "add": "Add",
+      "removeTag": "Remove tag",
+      "empty": "No tags created."
+    },
+    "customFields": {
+      "title": "Custom Fields",
+      "description": "Create specific fields for your business (e.g.: Tax ID, Contract Date, Source). They will appear in deal details.",
+      "editing": "Editing Field",
+      "nameLabel": "Field Name",
+      "namePlaceholder": "Ex: Expiry Date",
+      "typeLabel": "Type",
+      "types": {
+        "text": "Text",
+        "number": "Number",
+        "date": "Date",
+        "select": "Selection"
+      },
+      "optionsLabel": "Options (Comma-separated)",
+      "optionsPlaceholder": "Ex: Google, Facebook, Instagram, Referral",
+      "optionsHint": "These options will appear in a dropdown in the deal detail.",
+      "optionsCount": "{count} options",
+      "cancel": "Cancel",
+      "save": "Save",
+      "create": "Create",
+      "editField": "Edit field",
+      "removeField": "Remove field",
+      "empty": "No custom fields created."
+    },
+    "dataStorage": {
+      "statsTitle": "System Statistics",
+      "companies": "Companies",
+      "contacts": "Contacts",
+      "deals": "Deals",
+      "activities": "Activities",
+      "boards": "Boards",
+      "dangerZone": "Danger Zone",
+      "show": "Show",
+      "hide": "Hide",
+      "warningTitle": "⚠️ WARNING: This action will permanently delete:",
+      "tagsAndProducts": "All tags and products",
+      "totalRecords": "Total: {count} records will be deleted!",
+      "confirmLabel": "Type {code} to confirm:",
+      "confirmPlaceholder": "DELETE ALL",
+      "deleteButton": "💣 Wipe Database",
+      "deleting": "Deleting...",
+      "confirmCode": "DELETE ALL",
+      "toast": {
+        "typeConfirm": "Type \"DELETE ALL\" to confirm",
+        "noSupabase": "Supabase is not configured in this environment.",
+        "success": "🔥 Database wiped successfully!",
+        "error": "Error: {message}"
+      }
+    },
+    "lifecycle": {
+      "title": "Manage Lifecycle Stages",
+      "closeAriaLabel": "Close modal",
+      "description": "Define the maturity stages of your contacts (e.g.: Lead, Customer). The order here defines the funnel progression.",
+      "contactsInStage": "{count} contacts in this stage",
+      "removeDisabledDefault": "Default stage cannot be removed",
+      "removeDisabledContacts": "Cannot remove stage with linked contacts",
+      "removeStage": "Remove stage",
+      "newStagePlaceholder": "New stage name...",
+      "addStage": "Add Stage",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "products": {
+      "title": "Products/Services",
+      "description": "Company base catalog. In the deal you can still add custom items when you need to adapt to the client.",
+      "nameLabel": "Name",
+      "namePlaceholder": "Ex.: Session, Package, Implementation…",
+      "priceLabel": "Default Price",
+      "currencyLabel": "Currency",
+      "currencyAriaLabel": "Product currency",
+      "skuLabel": "SKU (optional)",
+      "skuPlaceholder": "SKU",
+      "descriptionLabel": "Description (optional)",
+      "descriptionPlaceholder": "Short and objective",
+      "createButton": "Create",
+      "createTitle": "Create product",
+      "saveAriaLabel": "Save changes",
+      "cancelAriaLabel": "Cancel editing",
+      "editAriaLabel": "Edit product",
+      "deleteAriaLabel": "Delete product",
+      "saveTitle": "Save",
+      "cancelTitle": "Cancel",
+      "editTitle": "Edit",
+      "deleteTitle": "Delete",
+      "empty": "No products registered yet."
+    },
+    "aiConfig": {
+      "title": "Artificial Intelligence",
+      "subtitle": "Configure which brain will power your CRM.",
+      "statusConfigured": "Configured by the organization",
+      "statusProvider": "Provider:",
+      "statusModel": "Model:",
+      "statusKey": "Key:",
+      "statusKeyConfigured": "configured",
+      "statusKeyNotConfigured": "not configured",
+      "modelCustomOption": "Other (Enter ID)",
+      "modelIdPlaceholder": "Enter the model ID (e.g.: gemini-3-pro-preview)",
+      "thinkingModeAriaLabel": "Enable Thinking Mode",
+      "promptCachingAriaLabel": "Enable Prompt Caching",
+      "webSearchAriaLabel": "Enable web search",
+      "keyPlaceholder": "Paste your key {hint}",
+      "removeKey": "Remove key",
+      "lgpdTitle": "Data Processing Notice (LGPD)",
+      "lgpdDeals": "The processing of your <strong>deals</strong> by AI",
+      "lgpdContacts": "The processing of your <strong>contacts</strong> by AI",
+      "lgpdActivities": "The processing of your <strong>activities</strong> by AI",
+      "lgpdSuggestions": "Generation of suggestions and texts by the configured provider",
+      "lgpdLegalBasis": "<strong>Legal basis:</strong> Data subject consent (Art. 7º, I and Art. 11, I of LGPD).",
+      "lgpdRevoke": "<strong>How to revoke:</strong> Remove your API key at any time by clicking the 🗑️ button next to the field."
+    },
+    "aiFeatures": {
+      "editPromptTitle": "Edit prompt",
+      "editPromptAriaLabel": "Edit prompt",
+      "copyKeyTitle": "Copy key",
+      "copyKeyAriaLabel": "Copy key",
+      "promptPlaceholder": "Paste/edit the prompt here…"
+    },
+    "apiKeys": {
+      "title": "API (Integrations)",
+      "namePlaceholder": "Name (e.g.: n8n, make, partner-x)",
+      "keyPlaceholder": "ncrm_… (only in memory, not saved)",
+      "actions": {
+        "createLead": "Create/Update Lead (Contact)",
+        "createDeal": "Create Deal",
+        "moveStage": "Move Deal Stage",
+        "createActivity": "Create Activity (note/task)"
+      },
+      "selectPlaceholder": "Select…",
+      "requiredFields": "Required: <strong>Email</strong> <strong>or</strong> Phone. <strong>Name</strong> is required only when creating.",
+      "fields": {
+        "leadName": "Lead name",
+        "source": "Source",
+        "email": "email@example.com",
+        "phone": "+5511999999999",
+        "role": "Role",
+        "rolePlaceholder": "Ex: Manager",
+        "company": "Company",
+        "companyPlaceholder": "Company Name",
+        "notes": "Notes",
+        "pipeline": "Pipeline (board)",
+        "leadIdentity": "Lead identity",
+        "moveToStage": "Move to stage",
+        "type": "Type",
+        "title": "Title",
+        "optional": "Optional",
+        "activityTypes": {
+          "NOTE": "Note",
+          "TASK": "Task",
+          "CALL": "Call",
+          "MEETING": "Meeting",
+          "EMAIL": "Email"
+        }
+      },
+      "deleteConfirm": {
+        "title": "Delete revoked key?",
+        "message": "This key will be permanently removed.",
+        "confirm": "Delete",
+        "cancel": "Cancel"
+      }
+    },
+    "mcp": {
+      "haveKey": "I already have an API key",
+      "keyPlaceholder": "Paste your API key here",
+      "manageKeys": "Need to revoke/view history? {link}",
+      "manageKeysLink": "Manage API keys"
+    },
+    "auditLog": {
+      "total": "Total",
+      "critical": "Critical",
+      "warnings": "Warnings",
+      "info": "Info",
+      "filtersLabel": "Filters:",
+      "allSeverities": "All Severities",
+      "severityCritical": "Critical",
+      "severityWarning": "Warning",
+      "severityInfo": "Info",
+      "allActions": "All Actions",
+      "loading": "Loading logs...",
+      "dateTime": "Date/Time:",
+      "userId": "User ID:",
+      "userAgent": "User Agent:",
+      "details": "Details:"
+    },
+    "webhooks": {
+      "inboundTitle": "Lead Intake (Webhook)",
+      "outboundTitle": "Follow-up (Outbound Webhook)",
+      "quickGuide": "Webhooks (quick guide)",
+      "urlLabel": "Webhook URL",
+      "secretLabel": "Secret (password)",
+      "destinationUrlLabel": "Destination URL",
+      "destinationUrlPlaceholder": "https://...",
+      "testNow": "Test now",
+      "received": "Received",
+      "error": "Error",
+      "currentUrl": "Current URL",
+      "noFollowup": "No follow-up connected yet.",
+      "pipelineLabel": "Pipeline",
+      "stageLabel": "Stage",
+      "deleteInboundConfirm": {
+        "title": "Delete inbound webhook?",
+        "confirm": "Delete",
+        "cancel": "Cancel"
+      },
+      "deleteOutboundConfirm": {
+        "title": "Delete follow-up (outbound webhook)?",
+        "confirm": "Delete",
+        "cancel": "Cancel"
+      }
+    }
+  },
+  "inbox": {
+    "focusView": {
+      "actionsLabel": "Actions",
+      "snooze": "Snooze",
+      "done": "Done",
+      "skip": "Skip",
+      "navLabel": "Navigate items",
+      "prevAriaLabel": "Previous item",
+      "nextAriaLabel": "Next item",
+      "linkContext": "Link context",
+      "linkContextTitle": "Link context",
+      "closeAriaLabel": "Close",
+      "searchDealPlaceholder": "Search deal by title…"
+    },
+    "listView": {
+      "applyAriaLabel": "Apply suggestion",
+      "applyTitle": "Apply",
+      "snoozeAriaLabel": "Snooze suggestion",
+      "snoozeTitle": "Snooze",
+      "discardAriaLabel": "Discard suggestion",
+      "discardTitle": "Discard",
+      "aiSuggestions": "AI Suggestions",
+      "overdueTitle": "Overdue",
+      "meetingsTodayTitle": "Today's Meetings",
+      "tasksTodayTitle": "Today's Tasks",
+      "upcomingTitle": "Upcoming"
+    },
+    "focusContextPanel": {
+      "health": "Health",
+      "reanalyzeAriaLabel": "Re-analyze with AI",
+      "nextAction": "Next Action",
+      "reanalyzeTitle": "Re-analyze",
+      "executeAs": "Execute as:",
+      "days": "Days",
+      "prob": "Prob",
+      "activities": "Act.",
+      "deal": "Deal",
+      "value": "Value",
+      "probability": "Probability",
+      "createdAt": "Created",
+      "updatedAt": "Updated",
+      "aiSummary": "AI Summary",
+      "pipeline": "Pipeline",
+      "timeInFunnel": "Time in funnel",
+      "notesPlaceholder": "Write...",
+      "dealNotes": "Deal Notes",
+      "dealNotePlaceholder": "Write a note...",
+      "noNotes": "No notes yet",
+      "generateScript": "Generate Script with AI",
+      "systemLabel": "System",
+      "editTitle": "Edit",
+      "deleteTitle": "Delete",
+      "uploadHint": "Click or drag (max 10MB)",
+      "noFiles": "No files yet"
+    },
+    "aiSuggestions": {
+      "snoozeTitle": "Snooze",
+      "discardTitle": "Discard",
+      "acceptTitle": "Accept"
+    },
+    "callModal": {
+      "openDialerTitle": "Open in dialer",
+      "openDialerAriaLabel": "Open in dialer",
+      "titlePlaceholder": "Ex: Follow-up call",
+      "notesPlaceholder": "What was discussed? Next steps?"
+    },
+    "messageComposer": {
+      "subjectPlaceholder": "Ex: Next steps",
+      "copySubjectTitle": "Copy subject",
+      "subjectCopied": "Subject copied",
+      "rewriteWithAITitle": "Rewrite with AI using cockpit context"
+    },
+    "scriptEditor": {
+      "titlePlaceholder": "Ex: Proposal Follow-up",
+      "scriptPlaceholder": "Hi {name}! 👋\n\nWrite your message here...\n\nUse {name} and {company} as variables.",
+      "noPreview": "No text to preview..."
+    }
   }
 }

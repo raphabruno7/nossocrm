@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { Activity, Deal, Contact, Company } from '@/types';
 import { ActivityRow } from './ActivityRow';
 
@@ -47,6 +48,7 @@ export const ActivitiesList: React.FC<ActivitiesListProps> = ({
     selectedActivities = new Set(),
     onSelectActivity
 }) => {
+    const t = useTranslations('activities.list');
     // Performance: Activities pode ser uma lista grande; evitamos `find` por linha (O(N*M)).
     const dealById = useMemo(() => {
         const map = new Map<string, Deal>();
@@ -69,7 +71,7 @@ export const ActivitiesList: React.FC<ActivitiesListProps> = ({
     if (activities.length === 0) {
         return (
             <div className="text-center py-12 bg-white dark:bg-dark-card rounded-xl border border-slate-200 dark:border-white/5 border-dashed">
-                <p className="text-slate-500 dark:text-slate-400">Nenhuma atividade encontrada</p>
+                <p className="text-slate-500 dark:text-slate-400">{t('empty')}</p>
             </div>
         );
     }

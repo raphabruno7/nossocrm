@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { User, Building2 } from 'lucide-react';
 
 interface ContactsTabsProps {
@@ -30,6 +31,8 @@ export const ContactsTabs: React.FC<ContactsTabsProps> = ({
     contactsCount,
     companiesCount
 }) => {
+    const t = useTranslations('contacts.tabs');
+
     return (
         <div className="border-b border-slate-200 dark:border-white/10">
             <div className="flex gap-6">
@@ -40,7 +43,7 @@ export const ContactsTabs: React.FC<ContactsTabsProps> = ({
                         : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                         }`}
                 >
-                    <User size={16} /> Pessoas
+                    <User size={16} /> {t('people')}
                     <span className="ml-1 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-full text-xs">
                         {contactsCount}
                     </span>
@@ -52,7 +55,7 @@ export const ContactsTabs: React.FC<ContactsTabsProps> = ({
                         : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                         }`}
                 >
-                    <Building2 size={16} /> Empresas
+                    <Building2 size={16} /> {t('companies')}
                     <span className="ml-1 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-full text-xs">
                         {companiesCount}
                     </span>

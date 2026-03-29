@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useCRM } from '@/context/CRMContext';
 import { useToast } from '@/context/ToastContext';
 import { TrendingUp, TrendingDown, Users, DollarSign, Target, Clock, MoreVertical, AlertTriangle } from 'lucide-react';
 import { StatCard } from './components/StatCard';
 import { ActivityFeedItem } from './components/ActivityFeedItem';
 import { PipelineAlertsModal } from './components/PipelineAlertsModal';
-import { useDashboardMetrics, PeriodFilter, COMPARISON_LABELS } from './hooks/useDashboardMetrics';
+import { useDashboardMetrics, PeriodFilter, getComparisonLabels } from './hooks/useDashboardMetrics';
 import { PeriodFilterSelect } from '@/components/filters/PeriodFilterSelect';
 import { LazyFunnelChart, ChartWrapper } from '@/components/charts';
 import { formatCurrencyCompact } from '@/lib/currency';
@@ -30,6 +31,9 @@ function formatChange(value: number): { text: string; isPositive: boolean } {
  */
 const DashboardPage: React.FC = () => {
   const router = useRouter();
+  const t = useTranslations('dashboard.page');
+  const comparisonT = useTranslations('common.periodFilter.comparison');
+  const comparisonLabels = getComparisonLabels(comparisonT);
   const { activities, lifecycleStages, contacts, boards } = useCRM();
   const { addToast } = useToast();
   const [period, setPeriod] = useState<PeriodFilter>('this_month');
@@ -103,17 +107,17 @@ const DashboardPage: React.FC = () => {
       <div className="flex justify-between items-center shrink-0">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white font-display tracking-tight">
-            Visão Geral
+            {t('title')}
           </h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
-            O pulso do seu negócio em tempo real.
+            {t('subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-3">
           <select
             value={selectedBoardId}
             onChange={(e) => setSelectedBoardId(e.target.value)}
-            aria-label="Selecionar Pipeline de Vendas"
+            aria-label={t('selectBoardAriaLabel')}
             className="px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
           >
             {boards.map(board => (
@@ -129,13 +133,13 @@ const DashboardPage: React.FC = () => {
               ? 'bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-900/30 text-amber-600 dark:text-amber-400'
               : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-700'
               }`}
-            title="Alertas de Pipeline"
+            title={t('pipelineAlerts')}
           >
             <AlertTriangle size={20} />
             {(riskyCount > 0 || stagnantDealsCount > 0) && (
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
             )}
-            <span className="sr-only">Alertas de Pipeline</span>
+            <span className="sr-only">{t('pipelineAlerts')}</span>
           </button>
 
           {/* Button removed */}
@@ -145,44 +149,44 @@ const DashboardPage: React.FC = () => {
       {/* KPI Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 shrink-0">
         <StatCard
-          title="Pipeline Total"
+          title={t('pipelineTotal')}
           value={formatCurrencyCompact(pipelineValue, currencyCode)}
           subtext={pipelineChangeInfo.text}
           subtextPositive={pipelineChangeInfo.isPositive}
           icon={DollarSign}
           color="bg-blue-500"
           onClick={() => router.push('/boards')}
-          comparisonLabel={COMPARISON_LABELS[period]}
+          comparisonLabel={comparisonLabels[period]}
         />
         <StatCard
-          title="Negócios Ativos"
+          title={t('activeDeals')}
           value={`${deals.length - wonDeals.length}`}
           subtext={dealsChangeInfo.text}
           subtextPositive={dealsChangeInfo.isPositive}
           icon={Users}
           color="bg-purple-500"
           onClick={() => router.push('/boards?status=open')}
-          comparisonLabel={COMPARISON_LABELS[period]}
+          comparisonLabel={comparisonLabels[period]}
         />
         <StatCard
-          title="Conversão"
+          title={t('conversion')}
           value={`${winRate.toFixed(1)}%`}
           subtext={winRateChangeInfo.text}
           subtextPositive={winRateChangeInfo.isPositive}
           icon={Target}
           color="bg-emerald-500"
           onClick={() => router.push('/reports')}
-          comparisonLabel={COMPARISON_LABELS[period]}
+          comparisonLabel={comparisonLabels[period]}
         />
         <StatCard
-          title="Receita (Ganha)"
+          title={t('wonRevenue')}
           value={formatCurrencyCompact(wonRevenue, currencyCode)}
           subtext={revenueChangeInfo.text}
           subtextPositive={revenueChangeInfo.isPositive}
           icon={TrendingUp}
           color="bg-orange-500"
           onClick={() => router.push('/boards?status=won&view=list')}
-          comparisonLabel={COMPARISON_LABELS[period]}
+          comparisonLabel={comparisonLabels[period]}
         />
       </div>
 
@@ -190,7 +194,7 @@ const DashboardPage: React.FC = () => {
       <div className="space-y-3 shrink-0">
         <h2 className="text-lg font-bold text-slate-900 dark:text-white font-display flex items-center gap-2">
           <Users className="text-primary-500" size={20} />
-          Saúde da Carteira
+          {t('walletHealth')}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div
@@ -198,42 +202,42 @@ const DashboardPage: React.FC = () => {
             onClick={() => router.push('/contacts')}
           >
             <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">
-              Distribuição da Carteira
+              {t('portfolioDistribution')}
             </h3>
             <div className="flex items-end gap-2 mb-2">
               <span className="text-2xl font-bold text-slate-900 dark:text-white">
                 {activePercent}%
               </span>
-              <span className="text-xs text-green-500 font-bold mb-1">Ativos</span>
+              <span className="text-xs text-green-500 font-bold mb-1">{t('active')}</span>
             </div>
             <div className="w-full bg-slate-100 dark:bg-white/10 rounded-full h-2 overflow-hidden flex">
               <div
                 className="bg-green-500 h-full"
                 style={{ width: `${activePercent}%` }}
-                title="Ativos"
+                title={t('active')}
               ></div>
               <div
                 className="bg-yellow-500 h-full"
                 style={{ width: `${inactivePercent}%` }}
-                title="Inativos"
+                title={t('inactive')}
               ></div>
               <div
                 className="bg-red-500 h-full"
                 style={{ width: `${churnedPercent}%` }}
-                title="Churn"
+                title={t('churn')}
               ></div>
             </div>
             <div className="flex justify-between mt-2 text-xs text-slate-500">
               <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-green-500"></div> Ativos (
+                <div className="w-2 h-2 rounded-full bg-green-500"></div> {t('active')} (
                 {activeContacts.length})
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-yellow-500"></div> Inativos (
+                <div className="w-2 h-2 rounded-full bg-yellow-500"></div> {t('inactive')} (
                 {inactiveContacts.length})
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-red-500"></div> Churn (
+                <div className="w-2 h-2 rounded-full bg-red-500"></div> {t('churn')} (
                 {churnedContacts.length})
               </div>
             </div>
@@ -244,35 +248,35 @@ const DashboardPage: React.FC = () => {
             onClick={() => setShowPipelineAlerts(true)}
           >
             <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">
-              Negócios Parados
+              {t('stagnantDeals')}
             </h3>
             <div className="flex items-end gap-2">
               <span className="text-2xl font-bold text-slate-900 dark:text-white">
-                {stagnantDealsCount} Deals
+                {t('dealsCount', { count: stagnantDealsCount })}
               </span>
               <span className={`text-xs font-bold mb-1 ${stagnantDealsCount > 0 ? 'text-amber-500' : 'text-green-500'}`}>
-                {stagnantDealsCount > 0 ? 'Atenção' : 'OK'}
+                {stagnantDealsCount > 0 ? t('attention') : t('ok')}
               </span>
             </div>
             <p className="text-xs text-slate-500 mt-2">
-              Sem mudança de estágio há +10 dias.
+              {t('stagnantDescription')}
             </p>
             <p className="text-xs text-slate-400 mt-1">
-              {formatCurrencyCompact(stagnantDealsValue, currencyCode)} em risco
+              {t('atRisk', { value: formatCurrencyCompact(stagnantDealsValue, currencyCode) })}
             </p>
           </div>
 
           <div className="glass p-5 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm">
             <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">
-              LTV Médio
+              {t('avgLtv')}
             </h3>
             <div className="flex items-end gap-2">
               <span className="text-2xl font-bold text-slate-900 dark:text-white">
                 {formatCurrencyCompact(avgLTV, currencyCode)}
               </span>
-              <span className="text-xs text-green-500 font-bold mb-1">Médio</span>
+              <span className="text-xs text-green-500 font-bold mb-1">{t('average')}</span>
             </div>
-            <p className="text-xs text-slate-500 mt-2">Valor médio vitalício por cliente ativo.</p>
+            <p className="text-xs text-slate-500 mt-2">{t('avgLtvDescription')}</p>
           </div>
         </div>
       </div>
@@ -283,7 +287,7 @@ const DashboardPage: React.FC = () => {
         <div className="glass p-5 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm flex flex-col h-full">
           <div className="flex justify-between items-center mb-2 shrink-0">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white font-display">
-              Funil
+              {t('funnel')}
             </h2>
           </div>
           <div className="flex-1 min-h-0 relative">
@@ -300,7 +304,7 @@ const DashboardPage: React.FC = () => {
           <div className="p-5 border-b border-slate-100 dark:border-white/5 bg-white/50 dark:bg-slate-900/50 rounded-t-xl backdrop-blur-sm z-10 shrink-0">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-bold text-slate-900 dark:text-white font-display">
-                Atividades Recentes
+                {t('recentActivities')}
               </h2>
             </div>
           </div>
@@ -314,7 +318,7 @@ const DashboardPage: React.FC = () => {
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-slate-500 py-8">
                   <Clock size={32} className="mb-2 opacity-50" />
-                  <p className="text-sm">Nenhuma atividade recente.</p>
+                  <p className="text-sm">{t('noRecentActivities')}</p>
                 </div>
               )}
             </div>
@@ -323,7 +327,7 @@ const DashboardPage: React.FC = () => {
               onClick={() => router.push('/activities')}
               className="w-full mt-4 py-2 text-sm text-primary-500 border border-dashed border-primary-500/30 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-500/10 transition-colors"
             >
-              Ver todas as atividades
+              {t('viewAllActivities')}
             </button>
           </div>
         </div>

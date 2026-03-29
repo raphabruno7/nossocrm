@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Download, Upload, FileDown } from 'lucide-react';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/context/ToastContext';
@@ -51,6 +52,7 @@ export function ContactsImportExportModal(props: {
   exportParams: ContactsExportParams;
 }) {
   const { isOpen, onClose, exportParams } = props;
+  const t = useTranslations('contacts.importExport');
   const { addToast, showToast } = useToast();
   const toast = addToast || showToast;
 
@@ -86,15 +88,15 @@ export function ContactsImportExportModal(props: {
   }, [delimiter]);
 
   const handleDownloadTemplate = () => {
-    downloadText('template-contatos.csv', templateCsv, 'text/csv;charset=utf-8');
-    toast?.('Template CSV baixado.', 'success');
+    downloadText(t('import.templateFilename'), templateCsv, 'text/csv;charset=utf-8');
+    toast?.(t('toasts.templateDownloaded'), 'success');
   };
 
   const handleDownloadErrorReport = () => {
     const errs: Array<{ rowNumber: number; message: string }> = importResult?.errors || [];
     const d: CsvDelimiter = delimiter === 'auto' ? ';' : delimiter;
     const rows = [['rowNumber', 'message'], ...errs.map(e => [String(e.rowNumber), e.message])];
-    downloadText('import-erros-contatos.csv', withUtf8Bom(stringifyCsv(rows, d)), 'text/csv;charset=utf-8');
+    downloadText(t('import.errorReportFilename'), withUtf8Bom(stringifyCsv(rows, d)), 'text/csv;charset=utf-8');
   };
 
   const buildExportUrl = () => {
@@ -117,16 +119,16 @@ export function ContactsImportExportModal(props: {
       const res = await fetch(url, { method: 'GET' });
       if (!res.ok) {
         const body = await res.json().catch(() => null);
-        throw new Error(body?.error || `Falha ao exportar (HTTP ${res.status})`);
+        throw new Error(body?.error || t('errors.exportFailed', { status: res.status }));
       }
 
       const disposition = res.headers.get('Content-Disposition');
-      const filename = parseFilenameFromDisposition(disposition) || 'contatos.csv';
+      const filename = parseFilenameFromDisposition(disposition) || t('export.defaultFilename');
       const text = await res.text();
       downloadText(filename, text, 'text/csv;charset=utf-8');
-      toast?.('Export iniciado.', 'success');
+      toast?.(t('toasts.exportStarted'), 'success');
     } catch (e) {
-      toast?.((e as Error)?.message || 'Erro ao exportar.', 'error');
+      toast?.((e as Error)?.message || t('errors.exportDefault'), 'error');
     } finally {
       setIsExporting(false);
     }
@@ -134,7 +136,7 @@ export function ContactsImportExportModal(props: {
 
   const handleImport = async () => {
     if (!file) {
-      toast?.('Selecione um arquivo CSV.', 'error');
+      toast?.(t('toasts.selectFile'), 'error');
       return;
     }
     setIsImporting(true);
@@ -149,16 +151,21 @@ export function ContactsImportExportModal(props: {
       const res = await fetch('/api/contacts/import', { method: 'POST', body: fd });
       const data = await res.json().catch(() => null);
       if (!res.ok) {
-        throw new Error(data?.error || `Falha ao importar (HTTP ${res.status})`);
+        throw new Error(data?.error || t('errors.importFailed', { status: res.status }));
       }
       setImportResult(data);
       const totals = data?.totals;
       toast?.(
-        `Import concluído: ${totals?.created ?? 0} criados, ${totals?.updated ?? 0} atualizados, ${totals?.skipped ?? 0} ignorados, ${totals?.errors ?? 0} erros.`,
+        t('toasts.importCompleted', {
+          created: totals?.created ?? 0,
+          updated: totals?.updated ?? 0,
+          skipped: totals?.skipped ?? 0,
+          errors: totals?.errors ?? 0,
+        }),
         (totals?.errors ?? 0) > 0 ? 'warning' : 'success'
       );
     } catch (e) {
-      toast?.((e as Error)?.message || 'Erro ao importar.', 'error');
+      toast?.((e as Error)?.message || t('errors.importDefault'), 'error');
     } finally {
       setIsImporting(false);
     }
@@ -168,7 +175,7 @@ export function ContactsImportExportModal(props: {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Importar / Exportar contatos"
+      title={t('title')}
       size="lg"
       bodyClassName="space-y-5 max-h-[75vh] overflow-y-auto"
     >
@@ -183,7 +190,7 @@ export function ContactsImportExportModal(props: {
                 : 'bg-white dark:bg-white/5 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10'
             }`}
           >
-            Exportar
+            {t('tabs.export')}
           </button>
           <button
             type="button"
@@ -194,23 +201,23 @@ export function ContactsImportExportModal(props: {
                 : 'bg-white dark:bg-white/5 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10'
             }`}
           >
-            Importar CSV
+            {t('tabs.import')}
           </button>
         </div>
 
         <div className="flex items-center gap-2">
           <label className="text-xs font-semibold text-slate-600 dark:text-slate-300">
-            Delimitador
+            {t('delimiter.label')}
           </label>
           <select
             value={delimiter}
             onChange={e => setDelimiter(e.target.value as any)}
             className="text-sm rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-2 py-1"
           >
-            <option value="auto">Auto</option>
-            <option value=",">, (vírgula)</option>
-            <option value=";">; (ponto e vírgula)</option>
-            <option value="\t">TAB</option>
+            <option value="auto">{t('delimiter.auto')}</option>
+            <option value=",">{t('delimiter.comma')}</option>
+            <option value=";">{t('delimiter.semicolon')}</option>
+            <option value="\t">{t('delimiter.tab')}</option>
           </select>
         </div>
       </div>
@@ -219,15 +226,15 @@ export function ContactsImportExportModal(props: {
         <div className="rounded-xl border border-slate-200 dark:border-white/10 p-4 bg-slate-50/50 dark:bg-white/5 space-y-3">
           <div>
             <div className="text-sm font-bold text-slate-900 dark:text-white">
-              Exportar contatos (CSV)
+              {t('export.title')}
             </div>
             <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              Padrão de mercado: exportar a lista respeitando filtros/pesquisa/ordenação atuais.
+              {t('export.description')}
             </div>
           </div>
 
           <div className="text-xs text-slate-600 dark:text-slate-300">
-            <b>Campos exportados:</b> name, email, phone, role, company, status, stage, notes, created_at, updated_at.
+            <b>{t('export.fields')}</b> name, email, phone, role, company, status, stage, notes, created_at, updated_at.
           </div>
 
           <button
@@ -240,7 +247,7 @@ export function ContactsImportExportModal(props: {
                 : 'bg-primary-600 hover:bg-primary-700 text-white'
             }`}
           >
-            <FileDown size={16} /> {isExporting ? 'Gerando…' : 'Exportar CSV'}
+            <FileDown size={16} /> {isExporting ? t('export.loading') : t('export.button')}
           </button>
         </div>
       )}
@@ -249,10 +256,10 @@ export function ContactsImportExportModal(props: {
         <div className="rounded-xl border border-slate-200 dark:border-white/10 p-4 bg-slate-50/50 dark:bg-white/5 space-y-4">
           <div>
             <div className="text-sm font-bold text-slate-900 dark:text-white">
-              Importar contatos (CSV)
+              {t('import.title')}
             </div>
             <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              Padrão de mercado: upload → validação → dedupe (por email) → resumo + relatório de erros.
+              {t('import.description')}
             </div>
           </div>
 
@@ -262,13 +269,13 @@ export function ContactsImportExportModal(props: {
               onClick={handleDownloadTemplate}
               className="px-3 py-2 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-semibold flex items-center gap-2"
             >
-              <Download size={16} /> Baixar template
+              <Download size={16} /> {t('import.downloadTemplate')}
             </button>
           </div>
 
           <div className="space-y-2">
             <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300">
-              Arquivo CSV
+              {t('import.fileLabel')}
             </label>
             <input
               type="file"
@@ -280,7 +287,7 @@ export function ContactsImportExportModal(props: {
 
           <div className="space-y-2">
             <div className="text-xs font-semibold text-slate-600 dark:text-slate-300">
-              Duplicados (match por email)
+              {t('import.duplicatesTitle')}
             </div>
             <div className="flex flex-col gap-2 text-sm text-slate-700 dark:text-slate-200">
               <label className="flex items-center gap-2">
@@ -290,7 +297,7 @@ export function ContactsImportExportModal(props: {
                   checked={mode === 'upsert_by_email'}
                   onChange={() => setMode('upsert_by_email')}
                 />
-                Atualizar se existir (recomendado)
+                {t('import.modes.upsert')}
               </label>
               <label className="flex items-center gap-2">
                 <input
@@ -299,7 +306,7 @@ export function ContactsImportExportModal(props: {
                   checked={mode === 'skip_duplicates_by_email'}
                   onChange={() => setMode('skip_duplicates_by_email')}
                 />
-                Ignorar linhas com email já existente
+                {t('import.modes.skip')}
               </label>
               <label className="flex items-center gap-2">
                 <input
@@ -308,7 +315,7 @@ export function ContactsImportExportModal(props: {
                   checked={mode === 'create_only'}
                   onChange={() => setMode('create_only')}
                 />
-                Sempre criar (pode duplicar)
+                {t('import.modes.create')}
               </label>
             </div>
           </div>
@@ -322,14 +329,13 @@ export function ContactsImportExportModal(props: {
               className="mt-1"
             />
             <span>
-              Criar empresas automaticamente a partir da coluna{' '}
-              <code className="px-1.5 py-0.5 rounded bg-slate-200/60 dark:bg-white/10">company</code>
+              {t('import.createCompaniesLabel', { column: 'company' })}
             </span>
           </label>
           <div className="text-xs text-slate-500 dark:text-slate-400 pl-7">
-            Quando marcado: se o CSV vier com o nome da empresa e ela ainda não existir no CRM, nós criamos a empresa e vinculamos o contato.
+            {t('import.createCompaniesHelpEnabled')}
             <br />
-            Quando desmarcado: não criamos empresas — se a empresa não existir, o contato entra <b>sem vínculo</b> de empresa.
+            {t('import.createCompaniesHelpDisabled')}
           </div>
           </div>
 
@@ -344,17 +350,19 @@ export function ContactsImportExportModal(props: {
                   : 'bg-primary-600 hover:bg-primary-700 text-white'
               }`}
             >
-              <Upload size={16} /> {isImporting ? 'Importando…' : 'Importar'}
+              <Upload size={16} /> {isImporting ? t('import.loading') : t('import.button')}
             </button>
           </div>
 
           {importResult && (
             <div className="rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-black/30 p-3 space-y-2">
               <div className="text-xs text-slate-600 dark:text-slate-300">
-                <b>Resumo:</b> {importResult.totals?.created ?? 0} criados •{' '}
-                {importResult.totals?.updated ?? 0} atualizados •{' '}
-                {importResult.totals?.skipped ?? 0} ignorados •{' '}
-                {importResult.totals?.errors ?? 0} erros
+                <b>{t('import.summary')}</b> {t('import.summaryCounts', {
+                  created: importResult.totals?.created ?? 0,
+                  updated: importResult.totals?.updated ?? 0,
+                  skipped: importResult.totals?.skipped ?? 0,
+                  errors: importResult.totals?.errors ?? 0,
+                })}
               </div>
               {(importResult.totals?.errors ?? 0) > 0 && (
                 <button
@@ -362,7 +370,7 @@ export function ContactsImportExportModal(props: {
                   onClick={handleDownloadErrorReport}
                   className="text-xs font-semibold text-primary-700 dark:text-primary-300 hover:underline w-fit"
                 >
-                  Baixar relatório de erros (CSV)
+                  {t('import.downloadErrors')}
                 </button>
               )}
             </div>
@@ -372,4 +380,3 @@ export function ContactsImportExportModal(props: {
     </Modal>
   );
 }
-

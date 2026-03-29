@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { Plus, LayoutList, Calendar as CalendarIcon } from 'lucide-react';
 
 interface ActivitiesHeaderProps {
@@ -30,26 +31,27 @@ export const ActivitiesHeader: React.FC<ActivitiesHeaderProps> = ({
   onNewActivity,
   dateFilter = 'ALL',
 }) => {
+  const t = useTranslations('activities.header');
   const filterLabel =
     dateFilter === 'overdue'
-      ? 'Atrasados'
+      ? t('filters.overdue')
       : dateFilter === 'today'
-        ? 'Hoje'
+        ? t('filters.today')
         : dateFilter === 'upcoming'
-          ? 'Próximos'
+          ? t('filters.upcoming')
           : null;
 
   return (
     <div className="flex justify-between items-center mb-8">
       <div>
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white font-display">
-          Atividades
+          {t('title')}
         </h1>
         <div className="mt-1 flex items-center gap-2">
-          <p className="text-slate-500 dark:text-slate-400">Gerencie suas tarefas e compromissos</p>
+          <p className="text-slate-500 dark:text-slate-400">{t('subtitle')}</p>
           {filterLabel && (
             <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary-100 text-primary-700 dark:bg-primary-500/20 dark:text-primary-300">
-              Filtro: {filterLabel}
+              {t('filterPrefix')}: {filterLabel}
             </span>
           )}
         </div>
@@ -82,7 +84,7 @@ export const ActivitiesHeader: React.FC<ActivitiesHeaderProps> = ({
           className="flex items-center gap-2 bg-primary-600 hover:bg-primary-500 text-white px-4 py-2.5 rounded-lg font-medium transition-colors shadow-lg shadow-primary-600/20"
         >
           <Plus size={20} />
-          Nova Atividade
+          {t('newActivity')}
         </button>
       </div>
     </div>
