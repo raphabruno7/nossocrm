@@ -1,5 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Trash2, X } from 'lucide-react';
 import { useContactsController } from './hooks/useContactsController';
 import { ContactsHeader } from './components/ContactsHeader';
@@ -21,6 +22,7 @@ import ConfirmModal from '@/components/ConfirmModal';
 export const ContactsPage: React.FC = () => {
     const controller = useContactsController();
     const router = useRouter();
+    const t = useTranslations('contacts.page');
     const [isImportExportOpen, setIsImportExportOpen] = React.useState(false);
 
     const goToDeal = (dealId: string) => {
@@ -87,13 +89,15 @@ export const ContactsPage: React.FC = () => {
                 <div className="flex items-center justify-between bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg px-4 py-3">
                     <div className="flex items-center gap-3">
                         <span className="text-sm font-medium text-primary-700 dark:text-primary-300">
-                            {controller.selectedIds.size} {controller.viewMode === 'people' ? 'contato(s)' : 'empresa(s)'} selecionado(s)
+                            {controller.viewMode === 'people'
+                                ? t('bulkActions.selectedPeople', { count: controller.selectedIds.size })
+                                : t('bulkActions.selectedCompanies', { count: controller.selectedIds.size })}
                         </span>
                         <button
                             onClick={controller.clearSelection}
                             className="text-xs text-primary-600 dark:text-primary-400 hover:underline"
                         >
-                            Limpar seleção
+                            {t('bulkActions.clearSelection')}
                         </button>
                     </div>
                     <div className="flex items-center gap-2">
@@ -102,7 +106,7 @@ export const ContactsPage: React.FC = () => {
                             className="flex items-center gap-2 px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-colors"
                         >
                             <Trash2 size={14} />
-                            Excluir selecionados
+                            {t('bulkActions.deleteSelected')}
                         </button>
                     </div>
                 </div>
@@ -173,9 +177,9 @@ export const ContactsPage: React.FC = () => {
                 isOpen={!!controller.deleteId}
                 onClose={() => controller.setDeleteId(null)}
                 onConfirm={controller.confirmDelete}
-                title="Excluir Contato"
-                message="Tem certeza que deseja excluir este contato? Esta ação não pode ser desfeita."
-                confirmText="Excluir"
+                title={t('deleteContact.title')}
+                message={t('deleteContact.message')}
+                confirmText={t('deleteContact.confirm')}
                 variant="danger"
             />
 
@@ -183,9 +187,9 @@ export const ContactsPage: React.FC = () => {
                 isOpen={!!controller.deleteCompanyId}
                 onClose={() => controller.setDeleteCompanyId(null)}
                 onConfirm={controller.confirmDeleteCompany}
-                title="Excluir Empresa"
-                message="Tem certeza que deseja excluir esta empresa? Esta ação não pode ser desfeita."
-                confirmText="Excluir"
+                title={t('deleteCompany.title')}
+                message={t('deleteCompany.message')}
+                confirmText={t('deleteCompany.confirm')}
                 variant="danger"
             />
 
@@ -194,10 +198,10 @@ export const ContactsPage: React.FC = () => {
                 isOpen={!!controller.deleteWithDeals}
                 onClose={() => controller.setDeleteWithDeals(null)}
                 onConfirm={controller.confirmDeleteWithDeals}
-                title="Contato com Negócios"
+                title={t('deleteWithDeals.title')}
                 message={
                     <div className="space-y-3">
-                        <p>Este contato possui {controller.deleteWithDeals?.dealCount || 0} negócio(s) vinculado(s):</p>
+                        <p>{t('deleteWithDeals.intro', { count: controller.deleteWithDeals?.dealCount || 0 })}</p>
                         <ul className="text-left bg-slate-100 dark:bg-slate-800/50 rounded-lg p-3 space-y-1 max-h-32 overflow-y-auto">
                             {controller.deleteWithDeals?.deals.map((deal) => (
                                 <li key={deal.id} className="text-sm">
@@ -210,10 +214,10 @@ export const ContactsPage: React.FC = () => {
                                 </li>
                             ))}
                         </ul>
-                        <p className="text-red-500 dark:text-red-400 font-medium">Ao excluir, todos os negócios também serão excluídos.</p>
+                        <p className="text-red-500 dark:text-red-400 font-medium">{t('deleteWithDeals.warning')}</p>
                     </div>
                 }
-                confirmText="Excluir Tudo"
+                confirmText={t('deleteWithDeals.confirm')}
                 variant="danger"
             />
 
@@ -222,25 +226,32 @@ export const ContactsPage: React.FC = () => {
                 isOpen={controller.bulkDeleteConfirm}
                 onClose={() => controller.setBulkDeleteConfirm(false)}
                 onConfirm={controller.confirmBulkDelete}
-                title={controller.viewMode === 'people' ? 'Excluir Contatos em Massa' : 'Excluir Empresas em Massa'}
+                title={controller.viewMode === 'people' ? t('bulkDelete.titlePeople') : t('bulkDelete.titleCompanies')}
                 message={
                     <div className="space-y-2">
                         <p>
-                            Tem certeza que deseja excluir <strong>{controller.selectedIds.size}</strong>{' '}
-                            {controller.viewMode === 'people' ? 'contato(s)' : 'empresa(s)'}?
+                            {t('bulkDelete.messagePrefix')} <strong>{controller.selectedIds.size}</strong>{' '}
+                            {controller.viewMode === 'people'
+                                ? t('bulkDelete.peopleNoun', { count: controller.selectedIds.size })
+                                : t('bulkDelete.companiesNoun', { count: controller.selectedIds.size })}
+                            ?
                         </p>
                         {controller.viewMode === 'people' ? (
                             <p className="text-red-500 dark:text-red-400 text-sm">
-                                Todos os negócios vinculados também serão excluídos. Esta ação não pode ser desfeita.
+                                {t('bulkDelete.warningPeople')}
                             </p>
                         ) : (
                             <p className="text-red-500 dark:text-red-400 text-sm">
-                                Contatos/negócios vinculados serão desvinculados da empresa antes da exclusão. Esta ação não pode ser desfeita.
+                                {t('bulkDelete.warningCompanies')}
                             </p>
                         )}
                     </div>
                 }
-                confirmText={`Excluir ${controller.selectedIds.size} ${controller.viewMode === 'people' ? 'contato(s)' : 'empresa(s)'}`}
+                confirmText={
+                    controller.viewMode === 'people'
+                        ? t('bulkDelete.confirmPeople', { count: controller.selectedIds.size })
+                        : t('bulkDelete.confirmCompanies', { count: controller.selectedIds.size })
+                }
                 variant="danger"
             />
         </div>

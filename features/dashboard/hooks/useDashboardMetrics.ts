@@ -30,6 +30,22 @@ export const PERIOD_LABELS: Record<PeriodFilter, string> = {
   last_year: 'Ano Passado',
 };
 
+type TranslationGetter = (key: string) => string;
+
+export const getPeriodLabels = (t: TranslationGetter): Record<PeriodFilter, string> => ({
+  all: t('all'),
+  today: t('today'),
+  yesterday: t('yesterday'),
+  last_7_days: t('last_7_days'),
+  last_30_days: t('last_30_days'),
+  this_month: t('this_month'),
+  last_month: t('last_month'),
+  this_quarter: t('this_quarter'),
+  last_quarter: t('last_quarter'),
+  this_year: t('this_year'),
+  last_year: t('last_year'),
+});
+
 /**
  * Labels que explicam com o que estamos comparando
  */
@@ -46,6 +62,20 @@ export const COMPARISON_LABELS: Record<PeriodFilter, string> = {
   this_year: 'vs ano passado',
   last_year: 'vs ano anterior',
 };
+
+export const getComparisonLabels = (t: TranslationGetter): Record<PeriodFilter, string> => ({
+  all: t('all'),
+  today: t('today'),
+  yesterday: t('yesterday'),
+  last_7_days: t('last_7_days'),
+  last_30_days: t('last_30_days'),
+  this_month: t('this_month'),
+  last_month: t('last_month'),
+  this_quarter: t('this_quarter'),
+  last_quarter: t('last_quarter'),
+  this_year: t('this_year'),
+  last_year: t('last_year'),
+});
 
 interface DateRange {
   start: Date;

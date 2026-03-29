@@ -10,12 +10,14 @@ import { useToast } from '@/context/ToastContext';
 import { supabase } from '@/lib/supabase';
 import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/query';
+import { useTranslations } from 'next-intl';
 
 /**
  * Componente React `DataStorageSettings`.
  * @returns {Element} Retorna um valor do tipo `Element`.
  */
 export const DataStorageSettings: React.FC = () => {
+    const t = useTranslations('settings.dataStorage');
     const { deals, contacts, companies, activities, boards, refresh } = useCRM();
     const { profile } = useAuth();
     const { addToast } = useToast();
@@ -41,13 +43,13 @@ export const DataStorageSettings: React.FC = () => {
     const totalRecords = stats.companies + stats.contacts + stats.deals + stats.activities + stats.boards;
 
     const handleNukeDatabase = async () => {
-        if (confirmText !== 'DELETAR TUDO') {
-            addToast('Digite "DELETAR TUDO" para confirmar', 'error');
+        if (confirmText !== t('confirmCode')) {
+            addToast(t('toast.typeConfirm'), 'error');
             return;
         }
 
         if (!sb) {
-            addToast('Supabase não está configurado neste ambiente.', 'error');
+            addToast(t('toast.noSupabase'), 'error');
             return;
         }
 
@@ -158,13 +160,13 @@ export const DataStorageSettings: React.FC = () => {
             // Força refresh de todos os contexts (Activities, Deals, etc.)
             await refresh();
 
-            addToast('🔥 Database zerado com sucesso!', 'success');
+            addToast(t('toast.success'), 'success');
             setConfirmText('');
             setShowDangerZone(false);
 
         } catch (error: any) {
             console.error('Erro ao zerar database:', error);
-            addToast(`Erro: ${error.message}`, 'error');
+            addToast(t('toast.error', { message: error.message }), 'error');
         } finally {
             setIsDeleting(false);
         }
@@ -176,29 +178,29 @@ export const DataStorageSettings: React.FC = () => {
             <div className="bg-white dark:bg-dark-card rounded-lg border border-gray-200 dark:border-dark-border p-6">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                     <Database className="w-5 h-5" />
-                    Estatísticas do Sistema
+                    {t('statsTitle')}
                 </h3>
 
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                     <div className="p-4 bg-gray-50 dark:bg-dark-bg rounded-lg text-center">
                         <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.companies}</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">Empresas</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">{t('companies')}</div>
                     </div>
                     <div className="p-4 bg-gray-50 dark:bg-dark-bg rounded-lg text-center">
                         <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.contacts}</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">Contatos</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">{t('contacts')}</div>
                     </div>
                     <div className="p-4 bg-gray-50 dark:bg-dark-bg rounded-lg text-center">
                         <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.deals}</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">Negócios</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">{t('deals')}</div>
                     </div>
                     <div className="p-4 bg-gray-50 dark:bg-dark-bg rounded-lg text-center">
                         <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.activities}</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">Atividades</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">{t('activities')}</div>
                     </div>
                     <div className="p-4 bg-gray-50 dark:bg-dark-bg rounded-lg text-center">
                         <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.boards}</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">Boards</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">{t('boards')}</div>
                     </div>
                 </div>
             </div>
@@ -209,13 +211,13 @@ export const DataStorageSettings: React.FC = () => {
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-semibold text-red-600 dark:text-red-400 flex items-center gap-2">
                             <AlertTriangle className="w-5 h-5" />
-                            Zona de Perigo
+                            {t('dangerZone')}
                         </h3>
                         <button
                             onClick={() => setShowDangerZone(!showDangerZone)}
                             className="text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
                         >
-                            {showDangerZone ? 'Esconder' : 'Mostrar'}
+                            {showDangerZone ? t('hide') : t('show')}
                         </button>
                     </div>
 
@@ -223,35 +225,35 @@ export const DataStorageSettings: React.FC = () => {
                         <div className="space-y-4">
                             <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
                                 <p className="text-sm text-red-700 dark:text-red-300 mb-2">
-                                    <strong>⚠️ ATENÇÃO:</strong> Esta ação vai excluir permanentemente:
+                                    {t('warningTitle')}
                                 </p>
                                 <ul className="text-sm text-red-600 dark:text-red-400 list-disc list-inside space-y-1">
-                                    <li>{stats.deals} negócios</li>
-                                    <li>{stats.contacts} contatos</li>
-                                    <li>{stats.companies} empresas de clientes</li>
-                                    <li>{stats.activities} atividades</li>
-                                    <li>{stats.boards} boards (e seus stages)</li>
-                                    <li>Todas as tags e produtos</li>
+                                    <li>{stats.deals} {t('deals').toLowerCase()}</li>
+                                    <li>{stats.contacts} {t('contacts').toLowerCase()}</li>
+                                    <li>{stats.companies} {t('companies').toLowerCase()}</li>
+                                    <li>{stats.activities} {t('activities').toLowerCase()}</li>
+                                    <li>{stats.boards} boards</li>
+                                    <li>{t('tagsAndProducts')}</li>
                                 </ul>
                                 <p className="text-sm text-red-700 dark:text-red-300 mt-3 font-medium">
-                                    Total: {totalRecords} registros serão apagados!
+                                    {t('totalRecords', { count: totalRecords })}
                                 </p>
                             </div>
 
                             <div className="space-y-3">
                                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                                    Digite <span className="font-mono bg-red-100 dark:bg-red-900/30 px-1 rounded">DELETAR TUDO</span> para confirmar:
+                                    {t('confirmLabel', { code: <span className="font-mono bg-red-100 dark:bg-red-900/30 px-1 rounded">{t('confirmCode')}</span> })}
                                 </label>
                                 <input
                                     type="text"
                                     value={confirmText}
                                     onChange={(e) => setConfirmText(e.target.value)}
-                                    placeholder="DELETAR TUDO"
+                                    placeholder={t('confirmPlaceholder')}
                                     className="w-full px-4 py-2 bg-white dark:bg-dark-bg border border-red-300 dark:border-red-800 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                 />
                                 <button
                                     onClick={handleNukeDatabase}
-                                    disabled={confirmText !== 'DELETAR TUDO' || isDeleting}
+                                    disabled={confirmText !== t('confirmCode') || isDeleting}
                                     className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium transition-all ${confirmText === 'DELETAR TUDO' && !isDeleting
                                             ? 'bg-red-600 hover:bg-red-700 text-white'
                                             : 'bg-slate-200 dark:bg-dark-hover text-slate-400 cursor-not-allowed'
@@ -260,12 +262,12 @@ export const DataStorageSettings: React.FC = () => {
                                     {isDeleting ? (
                                         <>
                                             <Loader2 className="w-4 h-4 animate-spin" />
-                                            Deletando...
+                                            {t('deleting')}
                                         </>
                                     ) : (
                                         <>
                                             <Trash2 className="w-4 h-4" />
-                                            💣 Zerar Database
+                                            {t('deleteButton')}
                                         </>
                                     )}
                                 </button>

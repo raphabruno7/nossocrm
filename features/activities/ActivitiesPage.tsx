@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useActivitiesController } from './hooks/useActivitiesController';
 import { ActivitiesHeader } from './components/ActivitiesHeader';
 import { ActivitiesFilters } from './components/ActivitiesFilters';
@@ -13,6 +14,7 @@ import { useToast } from '@/context/ToastContext';
  * @returns {Element} Retorna um valor do tipo `Element`.
  */
 export const ActivitiesPage: React.FC = () => {
+    const t = useTranslations('activities.page');
     const {
         viewMode,
         setViewMode,
@@ -62,13 +64,13 @@ export const ActivitiesPage: React.FC = () => {
         selectedActivities.forEach(id => {
             handleToggleComplete(id);
         });
-        addToast(`${selectedActivities.size} atividades concluídas!`, 'success');
+        addToast(t('completedSelected', { count: selectedActivities.size }), 'success');
         handleClearSelection();
     };
 
     const handleSnoozeAll = () => {
         // In a real app, this would update the date of each activity
-        addToast(`${selectedActivities.size} atividades adiadas para amanhã!`, 'success');
+        addToast(t('snoozedSelected', { count: selectedActivities.size }), 'success');
         handleClearSelection();
     };
 

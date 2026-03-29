@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useToast } from '@/context/ToastContext';
 import { useAuth } from '@/context/AuthContext';
 import { Activity } from '@/types';
@@ -18,6 +19,7 @@ import { useRealtimeSync } from '@/lib/realtime/useRealtimeSync';
  * @returns {{ viewMode: "list" | "calendar"; setViewMode: Dispatch<SetStateAction<"list" | "calendar">>; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; ... 18 more ...; handleSubmit: (e: FormEvent<...>) => void; }} Retorna um valor do tipo `{ viewMode: "list" | "calendar"; setViewMode: Dispatch<SetStateAction<"list" | "calendar">>; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; ... 18 more ...; handleSubmit: (e: FormEvent<...>) => void; }`.
  */
 export const useActivitiesController = () => {
+  const t = useTranslations('activities.toast');
   const searchParams = useSearchParams();
 
   // Auth for tenant organization_id
@@ -139,10 +141,10 @@ export const useActivitiesController = () => {
   };
 
   const handleDeleteActivity = (id: string) => {
-    if (window.confirm('Tem certeza que deseja excluir esta atividade?')) {
+    if (window.confirm(t('confirmDelete'))) {
       deleteActivityMutation.mutate(id, {
         onSuccess: () => {
-          showToast('Atividade excluída com sucesso', 'success');
+          showToast(t('deleted'), 'success');
         },
       });
     }
@@ -160,12 +162,12 @@ export const useActivitiesController = () => {
         },
         {
           onSuccess: () => {
-            showToast(activity.completed ? 'Atividade reaberta' : 'Atividade concluída', 'success');
+            showToast(activity.completed ? t('reopened') : t('completed'), 'success');
           },
         }
       );
     },
-    [activitiesById, showToast, updateActivityMutation]
+    [activitiesById, showToast, t, updateActivityMutation]
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -194,7 +196,7 @@ export const useActivitiesController = () => {
         },
         {
           onSuccess: () => {
-            showToast('Atividade atualizada com sucesso', 'success');
+            showToast(t('updated'), 'success');
             setIsModalOpen(false);
           },
         }
@@ -218,11 +220,11 @@ export const useActivitiesController = () => {
         },
         {
           onSuccess: () => {
-            showToast('Atividade criada com sucesso', 'success');
+            showToast(t('created'), 'success');
             setIsModalOpen(false);
           },
           onError: (error: Error) => {
-            showToast(`Erro ao criar atividade: ${error.message}`, 'error');
+            showToast(t('createError', { message: error.message }), 'error');
           },
         }
       );

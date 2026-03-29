@@ -3,6 +3,7 @@
  * CRUD interface for user custom scripts
  */
 import React, { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { X, Save, Sparkles, Eye, MessageSquare, AlertCircle, Target, RefreshCw } from 'lucide-react';
 import type { ScriptCategory } from '@/lib/supabase/quickScripts';
 
@@ -72,6 +73,7 @@ export function ScriptEditorModal({
     });
     const [showPreview, setShowPreview] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const t = useTranslations('inbox.scriptEditor');
 
     useEffect(() => {
         if (initialData) {
@@ -142,7 +144,7 @@ export function ScriptEditorModal({
                             type="text"
                             value={formData.title}
                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                            placeholder="Ex: Follow-up de Proposta"
+                            placeholder={t('titlePlaceholder')}
                             className="w-full px-4 py-2.5 bg-slate-800/50 border border-white/10 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent"
                         />
                     </div>
@@ -215,14 +217,14 @@ export function ScriptEditorModal({
                             <textarea
                                 value={formData.template}
                                 onChange={(e) => setFormData({ ...formData, template: e.target.value })}
-                                placeholder="Olá {nome}! 👋&#10;&#10;Escreva sua mensagem aqui...&#10;&#10;Use {nome} e {empresa} como variáveis."
+                                placeholder={t('scriptPlaceholder')}
                                 rows={8}
                                 className="w-full px-4 py-3 bg-slate-800/50 border border-white/10 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent resize-none font-mono text-sm"
                             />
                         ) : (
                             <div className="w-full px-4 py-3 bg-slate-800/50 border border-white/10 rounded-lg min-h-[200px] whitespace-pre-wrap text-sm text-white">
                                 {applyVariables(formData.template) ||
-                                    <span className="text-slate-500 italic">Nenhum texto para preview...</span>
+                                    <span className="text-slate-500 italic">{t('noPreview')}</span>
                                 }
                             </div>
                         )}

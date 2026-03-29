@@ -1,6 +1,7 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
+import { NextIntlClientProvider } from 'next-intl'
 
 vi.mock('next/navigation', () => ({
   usePathname: () => '/settings',
@@ -71,8 +72,17 @@ vi.mock('./components/McpSection', () => ({
 
 import SettingsPage from './SettingsPage'
 import { useAuth } from '@/context/AuthContext'
+import ptMessages from '@/messages/pt.json'
 
 const useAuthMock = vi.mocked(useAuth)
+
+function renderWithIntl(ui: React.ReactNode) {
+  return render(
+    <NextIntlClientProvider locale="pt" messages={ptMessages}>
+      {ui}
+    </NextIntlClientProvider>
+  )
+}
 
 describe('SettingsPage RBAC', () => {
   beforeEach(() => {
@@ -84,7 +94,7 @@ describe('SettingsPage RBAC', () => {
       profile: { role: 'vendedor' },
     } as any)
 
-    render(<SettingsPage />)
+    renderWithIntl(<SettingsPage />)
 
     expect(
       screen.queryByRole('heading', { name: /^Gerenciamento de Tags$/i })
@@ -108,7 +118,7 @@ describe('SettingsPage RBAC', () => {
       profile: { role: 'admin' },
     } as any)
 
-    render(<SettingsPage />)
+    renderWithIntl(<SettingsPage />)
 
     expect(
       screen.getByRole('heading', { name: /^Gerenciamento de Tags$/i })

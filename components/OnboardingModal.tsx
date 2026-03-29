@@ -1,4 +1,5 @@
 import React, { useId } from 'react';
+import { useTranslations } from 'next-intl';
 import { Sparkles, ArrowRight, X } from 'lucide-react';
 import { FocusTrap, useFocusReturn } from '@/lib/a11y';
 
@@ -23,6 +24,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
     onStart,
     onSkip
 }) => {
+    const t = useTranslations('boards.onboarding');
     const generatedId = useId();
     const titleId = `onboarding-title-${generatedId}`;
     const descId = `onboarding-desc-${generatedId}`;
@@ -62,7 +64,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                         <button
                             type="button"
                             onClick={onSkip}
-                            aria-label="Pular tutorial de boas-vindas"
+                            aria-label={t('skipAriaLabel')}
                             className="absolute top-4 right-4 p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors focus-visible-ring"
                         >
                             <X size={20} aria-hidden="true" />
@@ -83,7 +85,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                                 id={titleId}
                                 className="text-4xl font-bold mb-4"
                             >
-                                Bem-vindo ao seu CRM! 👋
+                                {t('title')}
                             </h1>
 
                             {/* Description */}
@@ -91,27 +93,29 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                                 id={descId}
                                 className="text-xl text-white/90 mb-8 max-w-xl mx-auto"
                             >
-                                Vamos criar seu <strong>primeiro board personalizado</strong> em menos de 30 segundos?
+                                {t.rich('description', {
+                                    strong: (chunks) => <strong>{chunks}</strong>,
+                                })}
                             </p>
 
                             {/* Features */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 text-left" role="list" aria-label="Recursos do CRM">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 text-left" role="list" aria-label={t('featuresAriaLabel')}>
                                 <div className="p-4 bg-white/10 rounded-xl backdrop-blur-sm" role="listitem">
                                     <div className="text-2xl mb-2" aria-hidden="true">🎯</div>
-                                    <h3 className="font-semibold mb-1">Templates Prontos</h3>
-                                    <p className="text-sm text-white/80">Vendas, Onboarding, CS e mais</p>
+                                    <h3 className="font-semibold mb-1">{t('cards.templates.title')}</h3>
+                                    <p className="text-sm text-white/80">{t('cards.templates.description')}</p>
                                 </div>
 
                                 <div className="p-4 bg-white/10 rounded-xl backdrop-blur-sm" role="listitem">
                                     <div className="text-2xl mb-2" aria-hidden="true">✨</div>
-                                    <h3 className="font-semibold mb-1">Criação com IA</h3>
-                                    <p className="text-sm text-white/80">Descreva seu negócio em 1 frase</p>
+                                    <h3 className="font-semibold mb-1">{t('cards.ai.title')}</h3>
+                                    <p className="text-sm text-white/80">{t('cards.ai.description')}</p>
                                 </div>
 
                                 <div className="p-4 bg-white/10 rounded-xl backdrop-blur-sm" role="listitem">
                                     <div className="text-2xl mb-2" aria-hidden="true">⚡</div>
-                                    <h3 className="font-semibold mb-1">Super Rápido</h3>
-                                    <p className="text-sm text-white/80">Menos de 30 segundos</p>
+                                    <h3 className="font-semibold mb-1">{t('cards.fast.title')}</h3>
+                                    <p className="text-sm text-white/80">{t('cards.fast.description')}</p>
                                 </div>
                             </div>
 
@@ -123,7 +127,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                                     className="px-8 py-4 bg-white text-primary-600 font-bold rounded-xl hover:bg-white/90 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-lg focus-visible-ring"
                                     autoFocus
                                 >
-                                    Começar agora
+                                    {t('start')}
                                     <ArrowRight size={20} aria-hidden="true" />
                                 </button>
 
@@ -132,13 +136,13 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                                     onClick={onSkip}
                                     className="px-8 py-4 bg-white/10 text-white font-semibold rounded-xl hover:bg-white/20 transition-all backdrop-blur-sm focus-visible-ring"
                                 >
-                                    Explorar por conta
+                                    {t('explore')}
                                 </button>
                             </div>
 
                             {/* Small print */}
                             <p className="mt-6 text-sm text-white/60">
-                                Você pode criar quantos boards quiser depois 😊
+                                {t('footnote')}
                             </p>
                         </div>
                     </div>

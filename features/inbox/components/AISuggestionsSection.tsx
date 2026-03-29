@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { AISuggestion, AISuggestionType } from '../hooks/useInboxController';
 import {
   Sparkles, 
@@ -78,6 +79,7 @@ export const AISuggestionsSection: React.FC<AISuggestionsSectionProps> = ({
   onDismiss,
   onSnooze
 }) => {
+  const t = useTranslations('inbox.aiSuggestions');
   if (suggestions.length === 0) return null;
 
   return (
@@ -148,21 +150,21 @@ export const AISuggestionsSection: React.FC<AISuggestionsSectionProps> = ({
                   <button
                     onClick={() => onSnooze(suggestion.id)}
                     className="p-2 text-slate-400 hover:text-slate-600 hover:bg-white/50 dark:hover:bg-white/10 rounded-lg transition-colors"
-                    title="Adiar"
+                    title={t('snoozeTitle')}
                   >
                     <Clock size={18} />
                   </button>
                   <button
                     onClick={() => onDismiss(suggestion.id)}
                     className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
-                    title="Descartar"
+                    title={t('discardTitle')}
                   >
                     <X size={18} />
                   </button>
                   <button
                     onClick={() => onAccept(suggestion)}
                     className="p-2 text-white bg-primary-500 hover:bg-primary-600 rounded-lg transition-colors shadow-sm"
-                    title="Aceitar"
+                    title={t('acceptTitle')}
                   >
                     <Check size={18} />
                   </button>

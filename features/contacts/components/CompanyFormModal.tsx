@@ -2,6 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useTranslations } from 'next-intl';
 import type { Company } from '@/types';
 import { Modal, ModalForm } from '@/components/ui/Modal';
 import { InputField, SubmitButton } from '@/components/ui/FormField';
@@ -39,6 +40,7 @@ export const CompanyFormModal: React.FC<CompanyFormModalProps> = ({
   onSubmit,
   editingCompany,
 }) => {
+  const t = useTranslations('contacts.companyForm');
   const form = useForm<CompanyFormInput>({
     resolver: zodResolver(companyFormSchema),
     defaultValues: {
@@ -76,37 +78,36 @@ export const CompanyFormModal: React.FC<CompanyFormModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={editingCompany ? 'Editar Empresa' : 'Nova Empresa'}
+      title={editingCompany ? t('editTitle') : t('createTitle')}
     >
       <ModalForm onSubmit={handleSubmit(handleFormSubmit)}>
         <InputField
-          label="Nome"
-          placeholder="Ex: Arcus CRM LTDA"
+          label={t('name')}
+          placeholder={t('namePlaceholder')}
           required
           error={errors.name}
           registration={register('name')}
         />
 
         <InputField
-          label="Setor"
-          placeholder="Ex: SaaS"
+          label={t('industry')}
+          placeholder={t('industryPlaceholder')}
           error={errors.industry}
           registration={register('industry')}
         />
 
         <InputField
-          label="Website"
-          placeholder="empresa.com"
-          hint="Sem http(s) (vamos normalizar automaticamente)."
+          label={t('website')}
+          placeholder={t('websitePlaceholder')}
+          hint={t('websiteHint')}
           error={errors.website}
           registration={register('website')}
         />
 
         <SubmitButton isLoading={isSubmitting}>
-          {editingCompany ? 'Salvar Alterações' : 'Criar Empresa'}
+          {editingCompany ? t('save') : t('create')}
         </SubmitButton>
       </ModalForm>
     </Modal>
   );
 };
-

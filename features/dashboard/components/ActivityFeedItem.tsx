@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import {
     Phone,
     Mail,
@@ -14,14 +15,6 @@ interface ActivityFeedItemProps {
     activity: Activity;
 }
 
-// Performance: reuse Intl formatter instead of instantiating options object per render.
-const ACTIVITY_FEED_DATE_FORMATTER = new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-});
-
 /**
  * Componente React `ActivityFeedItem`.
  *
@@ -29,6 +22,8 @@ const ACTIVITY_FEED_DATE_FORMATTER = new Intl.DateTimeFormat('pt-BR', {
  * @returns {Element} Retorna um valor do tipo `Element`.
  */
 export const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({ activity }) => {
+    const t = useTranslations('dashboard.activityFeed');
+    const locale = useLocale();
     // Smart Icon Logic: Corrigir visualmente inconsistências de dados legados/seed
     const titleLower = activity.title.toLowerCase();
     const visualType =
@@ -88,7 +83,16 @@ export const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({ activity }) 
     })();
 
     // Formatar data relativa ou absoluta melhorada
-    const formattedDate = ACTIVITY_FEED_DATE_FORMATTER.format(new Date(activity.date));
+    const formattedDate = React.useMemo(
+        () =>
+            new Intl.DateTimeFormat(locale, {
+                day: '2-digit',
+                month: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+            }).format(new Date(activity.date)),
+        [activity.date, locale]
+    );
 
     return (
         <div className="flex items-start gap-3 py-3 border-b border-slate-100 dark:border-white/5 last:border-0 hover:bg-slate-50 dark:hover:bg-white/5 px-2 rounded-lg transition-colors group">
@@ -101,7 +105,8 @@ export const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({ activity }) 
                 </p>
                 {activity.dealTitle && (
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
-                        em <span className="font-medium text-slate-600 dark:text-slate-300">{activity.dealTitle}</span>
+                        {t('inDeal')}{' '}
+                        <span className="font-medium text-slate-600 dark:text-slate-300">{activity.dealTitle}</span>
                     </p>
                 )}
                 {activity.description && (

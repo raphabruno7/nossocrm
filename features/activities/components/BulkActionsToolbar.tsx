@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { CheckCircle2, CalendarClock, X } from 'lucide-react';
 
 interface BulkActionsToolbarProps {
@@ -30,6 +31,7 @@ export const BulkActionsToolbar: React.FC<BulkActionsToolbarProps> = ({
     onSnoozeAll,
     onClearSelection
 }) => {
+    const t = useTranslations('activities.bulkActions');
     if (selectedCount === 0) return null;
 
     return (
@@ -40,7 +42,7 @@ export const BulkActionsToolbar: React.FC<BulkActionsToolbarProps> = ({
                         {selectedCount}
                     </div>
                     <span className="font-medium">
-                        {selectedCount === 1 ? '1 atividade selecionada' : `${selectedCount} atividades selecionadas`}
+                        {t('selected', { count: selectedCount })}
                     </span>
                 </div>
 
@@ -50,7 +52,7 @@ export const BulkActionsToolbar: React.FC<BulkActionsToolbarProps> = ({
                         className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium flex items-center gap-2 transition-colors"
                     >
                         <CheckCircle2 size={16} />
-                        Concluir
+                        {t('complete')}
                     </button>
 
                     <button
@@ -58,13 +60,13 @@ export const BulkActionsToolbar: React.FC<BulkActionsToolbarProps> = ({
                         className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium flex items-center gap-2 transition-colors"
                     >
                         <CalendarClock size={16} />
-                        Adiar 1 Dia
+                        {t('snooze')}
                     </button>
 
                     <button
                         onClick={onClearSelection}
                         className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
-                        title="Limpar seleção"
+                        title={t('clearSelection')}
                     >
                         <X size={20} />
                     </button>

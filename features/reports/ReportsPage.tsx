@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { TrendingUp, Clock, Target, DollarSign, Trophy, Users, Download, Settings } from 'lucide-react';
-import { useDashboardMetrics, PeriodFilter, COMPARISON_LABELS } from '../dashboard/hooks/useDashboardMetrics';
+import { useDashboardMetrics, PeriodFilter, getComparisonLabels, getPeriodLabels } from '../dashboard/hooks/useDashboardMetrics';
 import { PeriodFilterSelect } from '@/components/filters/PeriodFilterSelect';
 import { LazyRevenueTrendChart, ChartWrapper } from '@/components/charts';
 import { generateReportPDF } from './utils/generateReportPDF';
@@ -16,6 +17,11 @@ import { formatCurrencyCompact } from '@/lib/currency';
  */
 const ReportsPage: React.FC = () => {
   const router = useRouter();
+  const t = useTranslations('reports.page');
+  const periodT = useTranslations('common.periodFilter');
+  const comparisonT = useTranslations('common.periodFilter.comparison');
+  const periodLabels = getPeriodLabels(periodT);
+  const comparisonLabels = getComparisonLabels(comparisonT);
   const { boards } = useCRM();
   const { profile } = useAuth();
   const [period, setPeriod] = useState<PeriodFilter>('this_month');
@@ -134,8 +140,8 @@ const ReportsPage: React.FC = () => {
 
   const generatedBy = useMemo(() => {
     if (profile?.first_name && profile?.last_name) return `${profile.first_name} ${profile.last_name}`;
-    return profile?.first_name || profile?.email || 'Usuário';
-  }, [profile?.email, profile?.first_name, profile?.last_name]);
+    return profile?.first_name || profile?.email || t('generatedByFallback');
+  }, [profile?.email, profile?.first_name, profile?.last_name, t]);
 
   const handleExportPDF = useCallback(async () => {
     // generateReportPDF usa dynamic imports para carregar jsPDF apenas quando necessário
@@ -151,9 +157,39 @@ const ReportsPage: React.FC = () => {
         funnelData,
         currencyCode,
       },
-      period,
+      periodLabels[period],
+      {
+        title: t('pdf.title'),
+        pipelinePrefix: t('pdf.pipelinePrefix'),
+        defaultBoardName: t('pdf.defaultBoardName'),
+        generatedByPrefix: t('pdf.generatedByPrefix'),
+        timeConnector: t('pdf.timeConnector'),
+        fallbackUser: t('pdf.fallbackUser'),
+        kpis: {
+          pipelineTotal: t('pipelineTotal'),
+          winRate: t('winRate'),
+          avgCycle: t('avgCycle'),
+          closedVolume: t('closedVolume'),
+          min: t('pdf.min'),
+          days: t('pdf.days'),
+          deals: t('pdf.deals'),
+        },
+        funnelTitle: t('pdf.funnelTitle'),
+        leaderboardTitle: t('topSellers'),
+        noOwner: t('pdf.noOwner'),
+        noDataInPeriod: t('pdf.noDataInPeriod'),
+        tableHeaders: {
+          rank: t('pdf.table.rank'),
+          seller: t('pdf.table.seller'),
+          deals: t('pdf.table.deals'),
+          revenue: t('pdf.table.revenue'),
+        },
+        footerAppName: 'Arcus CRM',
+        footerPage: t('pdf.footerPage'),
+      },
       selectedBoard?.name,
-      generatedBy
+      generatedBy,
+      periodT('today') === 'Hoje' ? 'pt-BR' : 'en-US'
     );
   }, [
     actualWinRate,
@@ -164,7 +200,10 @@ const ReportsPage: React.FC = () => {
     generatedBy,
     period,
     pipelineValue,
+    periodLabels,
+    periodT,
     selectedBoard?.name,
+    t,
     wonDeals,
     wonRevenue,
   ]);
@@ -175,17 +214,17 @@ const ReportsPage: React.FC = () => {
       <div className="flex justify-between items-center shrink-0">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white font-display tracking-tight">
-            Relatórios de Performance
+            {t('title')}
           </h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
-            Análise detalhada de vendas e tendências.
+            {t('subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-3">
           <select
             value={selectedBoardId}
             onChange={(e) => setSelectedBoardId(e.target.value)}
-            aria-label="Selecionar Pipeline"
+            aria-label={t('selectPipelineAriaLabel')}
             className="px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
           >
             {boards.map(board => (
@@ -199,7 +238,7 @@ const ReportsPage: React.FC = () => {
             type="button"
             onClick={handleExportPDF}
             className="group flex items-center gap-2 px-3 py-2 rounded-lg glass border border-slate-200/50 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:border-slate-300 dark:hover:border-white/20 transition-all duration-200"
-            title="Exportar PDF"
+            title={t('exportPdfTitle')}
           >
             <Download size={16} className="group-hover:scale-110 transition-transform" />
             <span className="text-sm font-medium opacity-80 group-hover:opacity-100">PDF</span>
@@ -219,17 +258,17 @@ const ReportsPage: React.FC = () => {
             </div>
             <div className="flex items-center gap-4">
               <div className="text-right">
-                <span className="text-xs text-slate-500">Realizado</span>
+                <span className="text-xs text-slate-500">{t('realized')}</span>
                 <p className="text-lg font-bold text-emerald-500">{formatGoalValue(currentValue)}</p>
               </div>
               <div className="text-right">
-                <span className="text-xs text-slate-500">Meta</span>
+                <span className="text-xs text-slate-500">{t('goal')}</span>
                 <p className="text-lg font-bold text-slate-900 dark:text-white">{formatGoalValue(goalTarget)}</p>
               </div>
               <div className="text-right">
-                <span className="text-xs text-slate-500">Gap</span>
+                <span className="text-xs text-slate-500">{t('gap')}</span>
                 <p className={`text-lg font-bold ${forecastGap > 0 ? 'text-amber-500' : 'text-emerald-500'}`}>
-                  {forecastGap > 0 ? `-${formatGoalValue(forecastGap)}` : '✓ Atingido'}
+                  {forecastGap > 0 ? `-${formatGoalValue(forecastGap)}` : t('achieved')}
                 </p>
               </div>
             </div>
@@ -250,8 +289,8 @@ const ReportsPage: React.FC = () => {
           </div>
           <p className="text-xs text-slate-500 mt-2">
             {isOnTrack
-              ? `🎯 No ritmo! Faltam ${formatGoalValue(Math.abs(forecastGap))} para bater a meta.`
-              : `⚠️ Atenção! Você está abaixo de 75% da meta. Faltam ${formatGoalValue(Math.abs(forecastGap))}.`
+              ? t('onTrack', { amount: formatGoalValue(Math.abs(forecastGap)) })
+              : t('offTrack', { amount: formatGoalValue(Math.abs(forecastGap)) })
             }
           </p>
         </div>
@@ -260,14 +299,14 @@ const ReportsPage: React.FC = () => {
           <div className="flex items-center gap-3">
             <Settings className="text-amber-500" size={20} />
             <div className="flex-1">
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">Meta não configurada</h3>
-              <p className="text-xs text-slate-500">Defina uma meta no board para acompanhar o forecast.</p>
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white">{t('goalNotConfigured')}</h3>
+              <p className="text-xs text-slate-500">{t('goalNotConfiguredDescription')}</p>
             </div>
             <button
               onClick={() => router.push('/boards')}
               className="px-3 py-1.5 text-xs font-medium bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors"
             >
-              Configurar
+              {t('configure')}
             </button>
           </div>
         </div>
@@ -281,11 +320,11 @@ const ReportsPage: React.FC = () => {
             <div className="p-2 rounded-lg bg-blue-500/10">
               <DollarSign className="text-blue-500" size={18} />
             </div>
-            <span className="text-xs text-slate-500">Pipeline Total</span>
+            <span className="text-xs text-slate-500">{t('pipelineTotal')}</span>
           </div>
           <p className="text-2xl font-bold text-slate-900 dark:text-white">{formatMoney(pipelineValue)}</p>
           <p className={`text-xs ${changes.pipeline >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-            {changes.pipeline >= 0 ? '+' : ''}{changes.pipeline.toFixed(1)}% {COMPARISON_LABELS[period]}
+            {changes.pipeline >= 0 ? '+' : ''}{changes.pipeline.toFixed(1)}% {comparisonLabels[period]}
           </p>
         </div>
 
@@ -295,11 +334,11 @@ const ReportsPage: React.FC = () => {
             <div className="p-2 rounded-lg bg-emerald-500/10">
               <Target className="text-emerald-500" size={18} />
             </div>
-            <span className="text-xs text-slate-500">Win Rate</span>
+            <span className="text-xs text-slate-500">{t('winRate')}</span>
           </div>
           <p className="text-2xl font-bold text-slate-900 dark:text-white">{actualWinRate.toFixed(1)}%</p>
           <p className={`text-xs ${changes.winRate >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-            {changes.winRate >= 0 ? '+' : ''}{changes.winRate.toFixed(1)}% {COMPARISON_LABELS[period]}
+            {changes.winRate >= 0 ? '+' : ''}{changes.winRate.toFixed(1)}% {comparisonLabels[period]}
           </p>
         </div>
 
@@ -309,11 +348,11 @@ const ReportsPage: React.FC = () => {
             <div className="p-2 rounded-lg bg-purple-500/10">
               <Clock className="text-purple-500" size={18} />
             </div>
-            <span className="text-xs text-slate-500">Ciclo Médio</span>
+            <span className="text-xs text-slate-500">{t('avgCycle')}</span>
           </div>
-          <p className="text-2xl font-bold text-slate-900 dark:text-white">{avgSalesCycle} dias</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white">{t('avgCycleValue', { count: avgSalesCycle })}</p>
           <p className="text-xs text-slate-500">
-            Rápido: {fastestDeal}d | Lento: {slowestDeal}d
+            {t('fastSlow', { fast: fastestDeal, slow: slowestDeal })}
           </p>
         </div>
 
@@ -323,7 +362,7 @@ const ReportsPage: React.FC = () => {
             <div className="p-2 rounded-lg bg-orange-500/10">
               <TrendingUp className="text-orange-500" size={18} />
             </div>
-            <span className="text-xs text-slate-500">Deals Fechados</span>
+            <span className="text-xs text-slate-500">{t('closedDeals')}</span>
           </div>
           <p className="text-2xl font-bold text-slate-900 dark:text-white">
             <span className="text-emerald-500">{wonDeals.length}</span>
@@ -331,7 +370,7 @@ const ReportsPage: React.FC = () => {
             <span className="text-red-500">{lostDeals.length}</span>
           </p>
           <p className="text-xs text-slate-500">
-            Ganhos / Perdas
+            {t('winsLosses')}
           </p>
         </div>
       </div>
@@ -342,10 +381,10 @@ const ReportsPage: React.FC = () => {
         <div className="lg:col-span-2 glass p-5 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm flex flex-col h-full">
           <div className="flex justify-between items-center mb-2 shrink-0">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white font-display">
-              Tendência de Receita
+              {t('revenueTrend')}
             </h2>
             <span className="text-xs text-slate-500 bg-slate-100 dark:bg-white/5 px-2 py-1 rounded">
-              Últimos 6 Meses
+              {t('lastSixMonths')}
             </span>
           </div>
           <div className="flex-1 min-h-0 relative">
@@ -362,7 +401,7 @@ const ReportsPage: React.FC = () => {
           <div className="flex justify-between items-center mb-3 shrink-0">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white font-display flex items-center gap-2">
               <Trophy className="text-amber-500" size={20} />
-              Top Vendedores
+              {t('topSellers')}
             </h2>
           </div>
           <div className="flex-1 overflow-y-auto min-h-0 space-y-2">
@@ -389,7 +428,7 @@ const ReportsPage: React.FC = () => {
                   />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{rep.name}</p>
-                    <p className="text-xs text-slate-500">{rep.deals} deals</p>
+                    <p className="text-xs text-slate-500">{t('dealsCount', { count: rep.deals })}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-bold text-emerald-500">{formatMoney(rep.revenue)}</p>
@@ -399,7 +438,7 @@ const ReportsPage: React.FC = () => {
             ) : (
               <div className="flex flex-col items-center justify-center h-full text-slate-500 py-6">
                 <Users size={32} className="mb-2 opacity-50" />
-                <p className="text-sm">Nenhum deal fechado no período.</p>
+                <p className="text-sm">{t('noClosedDeals')}</p>
               </div>
             )}
           </div>

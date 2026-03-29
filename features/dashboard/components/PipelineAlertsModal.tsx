@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { X, AlertTriangle, Clock, Calendar, TrendingUp, ChevronRight } from 'lucide-react';
 import type { CurrencyCode, Deal } from '@/types';
 import { formatCurrencyCompact } from '@/lib/currency';
@@ -47,11 +48,11 @@ export const PipelineAlertsModal: React.FC<PipelineAlertsModalProps> = ({
   onNavigateToDeal,
   currencyCode = 'BRL',
 }) => {
+  const t = useTranslations('dashboard.pipelineAlertsModal');
   if (!isOpen) return null;
 
   // Performance: use timestamps for comparisons to reduce Date allocations.
   const nowTs = Date.now();
-  const now = new Date(nowTs);
   const tenDaysAgoTs = nowTs - 10 * 24 * 60 * 60 * 1000;
 
   // Deals ativos (não ganhos nem perdidos)
@@ -88,24 +89,24 @@ export const PipelineAlertsModal: React.FC<PipelineAlertsModalProps> = ({
   const alerts: PipelineAlert[] = [
     {
       type: 'stagnant',
-      title: 'Negócios Estagnados',
-      description: 'Sem mudança de estágio há mais de 10 dias',
+      title: t('stagnant.title'),
+      description: t('stagnant.description'),
       deals: stagnantDeals,
       color: 'text-red-500 bg-red-500/10',
       icon: AlertTriangle,
     },
     {
       type: 'no-activity',
-      title: 'Sem Próximo Passo',
-      description: 'Nenhuma atividade futura agendada',
+      title: t('noActivity.title'),
+      description: t('noActivity.description'),
       deals: dealsWithoutActivity,
       color: 'text-amber-500 bg-amber-500/10',
       icon: Calendar,
     },
     {
       type: 'ready-to-close',
-      title: 'Prontos para Fechar',
-      description: 'Alta probabilidade de conversão',
+      title: t('readyToClose.title'),
+      description: t('readyToClose.description'),
       deals: readyToCloseDeals,
       color: 'text-emerald-500 bg-emerald-500/10',
       icon: TrendingUp,
@@ -130,19 +131,19 @@ export const PipelineAlertsModal: React.FC<PipelineAlertsModalProps> = ({
           <div>
             <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <Clock className="text-primary-500" size={24} />
-              Alertas de Pipeline
+              {t('title')}
             </h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
               {totalAlerts > 0 
-                ? `${totalAlerts} itens precisam de atenção`
-                : 'Seu pipeline está saudável! 🎉'
+                ? t('needsAttention', { count: totalAlerts })
+                : t('healthy')
               }
             </p>
           </div>
           <button
             onClick={onClose}
             className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg transition-colors"
-            aria-label="Fechar"
+            aria-label={t('closeAriaLabel')}
           >
             <X size={20} className="text-slate-500" />
           </button>
@@ -190,7 +191,10 @@ export const PipelineAlertsModal: React.FC<PipelineAlertsModalProps> = ({
                           {deal.title}
                         </p>
                         <p className="text-sm text-slate-500 dark:text-slate-400">
-                          {formatCurrencyCompact(deal.value, currencyCode)} • {deal.probability}% probabilidade
+                          {t('dealProbability', {
+                            value: formatCurrencyCompact(deal.value, currencyCode),
+                            probability: deal.probability,
+                          })}
                         </p>
                       </div>
                       <ChevronRight 
@@ -201,13 +205,13 @@ export const PipelineAlertsModal: React.FC<PipelineAlertsModalProps> = ({
                   ))}
                   {alert.deals.length > 5 && (
                     <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-2">
-                      + {alert.deals.length - 5} outros deals
+                      {t('otherDeals', { count: alert.deals.length - 5 })}
                     </p>
                   )}
                 </div>
               ) : (
                 <p className="text-sm text-slate-400 dark:text-slate-500 pl-11 italic">
-                  Nenhum deal nesta categoria ✓
+                  {t('noDeals')}
                 </p>
               )}
             </div>
@@ -217,7 +221,7 @@ export const PipelineAlertsModal: React.FC<PipelineAlertsModalProps> = ({
         {/* Footer */}
         <div className="p-4 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5">
           <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
-            💡 Dica: Deals sem atividade futura têm menor chance de conversão. Agende próximos passos!
+            {t('tip')}
           </p>
         </div>
       </div>

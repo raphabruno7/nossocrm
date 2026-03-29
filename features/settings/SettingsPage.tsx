@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useSettingsController } from './hooks/useSettingsController';
 import { TagsManager } from './components/TagsManager';
 import { CustomFieldsManager } from './components/CustomFieldsManager';
@@ -22,6 +23,7 @@ interface GeneralSettingsProps {
 }
 
 const GeneralSettings: React.FC<GeneralSettingsProps> = ({ hash, isAdmin }) => {
+  const t = useTranslations('settings.page.general');
   const controller = useSettingsController();
 
   // Scroll to hash element (e.g., #ai-config)
@@ -43,23 +45,23 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({ hash, isAdmin }) => {
       {/* General Settings */}
       <div className="mb-12">
         <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-6">
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">Página Inicial</h3>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">{t('title')}</h3>
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-            Escolha qual tela deve abrir quando você iniciar o CRM.
+            {t('subtitle')}
           </p>
           <select
-            aria-label="Selecionar página inicial"
+            aria-label={t('selectAriaLabel')}
             value={controller.defaultRoute}
             onChange={(e) => controller.setDefaultRoute(e.target.value)}
             className="w-full max-w-xs px-4 py-2.5 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-slate-900 dark:text-white transition-all"
           >
-            <option value="/dashboard">Dashboard</option>
-            <option value="/inbox-list">Inbox (Lista)</option>
-            <option value="/inbox-focus">Inbox (Foco)</option>
-            <option value="/boards">Boards (Kanban)</option>
-            <option value="/contacts">Contatos</option>
-            <option value="/activities">Atividades</option>
-            <option value="/reports">Relatórios</option>
+            <option value="/dashboard">{t('routes.dashboard')}</option>
+            <option value="/inbox-list">{t('routes.inboxList')}</option>
+            <option value="/inbox-focus">{t('routes.inboxFocus')}</option>
+            <option value="/boards">{t('routes.boards')}</option>
+            <option value="/contacts">{t('routes.contacts')}</option>
+            <option value="/activities">{t('routes.activities')}</option>
+            <option value="/reports">{t('routes.reports')}</option>
           </select>
         </div>
       </div>
@@ -174,6 +176,7 @@ interface SettingsPageProps {
  * @returns {Element} Retorna um valor do tipo `Element`.
  */
 const SettingsPage: React.FC<SettingsPageProps> = ({ tab: initialTab }) => {
+  const t = useTranslations('settings.page.tabs');
   const { profile } = useAuth();
   const pathname = usePathname();
   const [activeTab, setActiveTab] = useState<SettingsTab>(initialTab || 'general');
@@ -199,12 +202,12 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ tab: initialTab }) => {
   }, [pathname]);
 
   const tabs = [
-    { id: 'general' as SettingsTab, name: 'Geral', icon: SettingsIcon },
-    ...(profile?.role === 'admin' ? [{ id: 'products' as SettingsTab, name: 'Produtos/Serviços', icon: Package }] : []),
-    ...(profile?.role === 'admin' ? [{ id: 'integrations' as SettingsTab, name: 'Integrações', icon: Plug }] : []),
-    { id: 'ai' as SettingsTab, name: 'Central de I.A', icon: Sparkles },
-    { id: 'data' as SettingsTab, name: 'Dados', icon: Database },
-    ...(profile?.role === 'admin' ? [{ id: 'users' as SettingsTab, name: 'Equipe', icon: Users }] : []),
+    { id: 'general' as SettingsTab, name: t('general'), icon: SettingsIcon },
+    ...(profile?.role === 'admin' ? [{ id: 'products' as SettingsTab, name: t('products'), icon: Package }] : []),
+    ...(profile?.role === 'admin' ? [{ id: 'integrations' as SettingsTab, name: t('integrations'), icon: Plug }] : []),
+    { id: 'ai' as SettingsTab, name: t('ai'), icon: Sparkles },
+    { id: 'data' as SettingsTab, name: t('data'), icon: Database },
+    ...(profile?.role === 'admin' ? [{ id: 'users' as SettingsTab, name: t('users'), icon: Users }] : []),
   ];
 
   const renderContent = () => {
@@ -256,4 +259,3 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ tab: initialTab }) => {
 };
 
 export default SettingsPage;
-

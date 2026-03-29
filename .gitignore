@@ -37,6 +37,7 @@ dev_server.log
 
 # Cursor IDE (local/personal configs)
 .cursor/
+.worktrees/
 
 # Other AI/dev tools (local configs)
 .jules/

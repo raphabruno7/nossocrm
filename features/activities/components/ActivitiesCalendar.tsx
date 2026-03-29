@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Phone, Users, Mail, CheckSquare } from 'lucide-react';
 import { Activity, Deal } from '@/types';
 
@@ -10,7 +11,6 @@ interface ActivitiesCalendarProps {
 }
 
 const HOURS = Array.from({ length: 10 }, (_, i) => i + 9); // 9:00 to 18:00
-const DAYS_OF_WEEK = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
 /**
  * Componente React `ActivitiesCalendar`.
@@ -34,6 +34,21 @@ export const ActivitiesCalendar: React.FC<ActivitiesCalendarProps> = ({
     currentDate,
     setCurrentDate
 }) => {
+    const t = useTranslations('activities.calendar');
+    const locale = useLocale();
+    const localeTag = locale === 'pt' ? 'pt-BR' : 'en-US';
+    const weekdayFormatter = useMemo(
+        () => new Intl.DateTimeFormat(localeTag, { weekday: 'short' }),
+        [localeTag]
+    );
+    const monthFormatter = useMemo(
+        () => new Intl.DateTimeFormat(localeTag, { month: 'long', year: 'numeric' }),
+        [localeTag]
+    );
+    const timeFormatter = useMemo(
+        () => new Intl.DateTimeFormat(localeTag, { hour: '2-digit', minute: '2-digit' }),
+        [localeTag]
+    );
     const getWeekStart = (date: Date) => {
         const d = new Date(date);
         const day = d.getDay();
@@ -120,14 +135,14 @@ export const ActivitiesCalendar: React.FC<ActivitiesCalendarProps> = ({
             <div className="p-6 border-b border-slate-200 dark:border-white/10 flex justify-between items-center bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800/50 dark:to-slate-900/50">
                 <div className="flex items-center gap-4">
                     <h2 className="font-bold text-2xl text-slate-900 dark:text-white font-display">
-                        {weekStart.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+                        {monthFormatter.format(weekStart)}
                     </h2>
                     <button
                         onClick={goToToday}
                         className="px-4 py-2 text-sm font-bold bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50 hover:scale-105"
                     >
                         <CalendarIcon size={14} />
-                        Hoje
+                        {t('today')}
                     </button>
                 </div>
                 <div className="flex gap-2">
@@ -155,7 +170,7 @@ export const ActivitiesCalendar: React.FC<ActivitiesCalendarProps> = ({
                                     }`}
                             >
                                 <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                                    {DAYS_OF_WEEK[date.getDay()]}
+                                    {weekdayFormatter.format(date)}
                                 </div>
                                 <div className={`text-2xl font-black mt-1 font-display ${isToday(date)
                                         ? 'text-primary-600 dark:text-primary-400'
@@ -210,7 +225,7 @@ export const ActivitiesCalendar: React.FC<ActivitiesCalendarProps> = ({
                                                                 {getActivityIcon(activity.type)}
                                                             </div>
                                                             <span className="font-black text-white text-sm">
-                                                                {new Date(activity.date).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                                                {timeFormatter.format(new Date(activity.date))}
                                                             </span>
                                                         </div>
                                                         <div className={`font-bold text-white leading-tight ${activity.completed ? 'line-through' : ''}`}>
@@ -223,7 +238,7 @@ export const ActivitiesCalendar: React.FC<ActivitiesCalendarProps> = ({
                                                                 {activity.description}
                                                             </p>
                                                             <p className="text-xs text-white/80 mt-1 font-medium">
-                                                                📎 {activity.dealId ? (dealTitleById.get(activity.dealId) ?? 'Sem deal vinculado') : 'Sem deal vinculado'}
+                                                                📎 {activity.dealId ? (dealTitleById.get(activity.dealId) ?? t('noLinkedDeal')) : t('noLinkedDeal')}
                                                             </p>
                                                         </div>
                                                     </div>
