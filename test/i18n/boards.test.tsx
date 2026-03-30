@@ -5,7 +5,8 @@ import { vi } from 'vitest';
 import enMessages from '@/messages/en.json';
 import { KanbanBoard } from '@/features/boards/components/Kanban/KanbanBoard';
 import { DealCard } from '@/features/boards/components/Kanban/DealCard';
-import { BoardStage, DealView } from '@/types';
+import { KanbanHeader } from '@/features/boards/components/Kanban/KanbanHeader';
+import { Board, BoardStage, DealView } from '@/types';
 
 vi.mock('@/context/CRMContext', () => ({
   useCRM: () => ({ lifecycleStages: [] }),
@@ -37,6 +38,14 @@ const dealBase: DealView = {
   boardId: 'board-1',
   contactId: 'contact-1',
   lossReason: null,
+};
+
+const activeBoard: Board = {
+  id: 'board-1',
+  name: 'Sales',
+  stages: [],
+  color: 'bg-blue-500',
+  createdAt: new Date().toISOString(),
 };
 
 function wrap(ui: React.ReactNode) {
@@ -124,5 +133,31 @@ describe('DealCard i18n', () => {
     );
     expect(screen.getByText('✗ LOST')).toBeInTheDocument();
     expect(screen.getByLabelText('Deal lost')).toBeInTheDocument();
+  });
+});
+
+describe('KanbanHeader i18n', () => {
+  test('renders "New Deal" button and filter options in English', () => {
+    wrap(
+      <KanbanHeader
+        boards={[activeBoard]}
+        activeBoard={activeBoard}
+        onSelectBoard={() => {}}
+        onCreateBoard={() => {}}
+        viewMode="kanban"
+        setViewMode={() => {}}
+        searchTerm=""
+        setSearchTerm={() => {}}
+        ownerFilter="all"
+        setOwnerFilter={() => {}}
+        statusFilter="open"
+        setStatusFilter={() => {}}
+        onNewDeal={() => {}}
+      />
+    );
+    expect(screen.getByRole('button', { name: /new deal/i })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Open' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'All Owners' })).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Filter deals or companies...')).toBeInTheDocument();
   });
 });

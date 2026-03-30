@@ -367,6 +367,24 @@
       "talkButton": "Falar",
       "entrySection": "Entrada"
     },
+    "kanbanHeader": {
+      "boardSettings": "Configurações do Board",
+      "exportTemplate": "Exportar template (comunidade)",
+      "automationSuggestions": "Automações Sugeridas",
+      "automationSuggestionsDesc": "Dicas da IA para otimizar este processo.",
+      "searchPlaceholder": "Filtrar negócios ou empresas...",
+      "statusOpen": "Em Aberto",
+      "statusWon": "Ganhos",
+      "statusLost": "Perdidos",
+      "statusAll": "Todos",
+      "ownerAll": "Todos os Donos",
+      "ownerMine": "Meus Negócios",
+      "filterByStatus": "Filtrar por status",
+      "filterByOwner": "Filtrar negócios por proprietário",
+      "viewKanban": "Visualização em quadro Kanban",
+      "viewList": "Visualização em lista",
+      "newDeal": "Novo Negócio"
+    },
     "kanbanBoard": {
       "promotesToLabel": "Promove para: {name}",
       "stageTotal": "Total:",

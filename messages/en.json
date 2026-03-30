@@ -367,6 +367,24 @@
       "talkButton": "Talk",
       "entrySection": "Entry"
     },
+    "kanbanHeader": {
+      "boardSettings": "Board Settings",
+      "exportTemplate": "Export template (community)",
+      "automationSuggestions": "Suggested Automations",
+      "automationSuggestionsDesc": "AI tips to optimize this process.",
+      "searchPlaceholder": "Filter deals or companies...",
+      "statusOpen": "Open",
+      "statusWon": "Won",
+      "statusLost": "Lost",
+      "statusAll": "All",
+      "ownerAll": "All Owners",
+      "ownerMine": "My Deals",
+      "filterByStatus": "Filter by status",
+      "filterByOwner": "Filter deals by owner",
+      "viewKanban": "Kanban board view",
+      "viewList": "List view",
+      "newDeal": "New Deal"
+    },
     "kanbanBoard": {
       "promotesToLabel": "Promotes to: {name}",
       "stageTotal": "Total:",
